@@ -109,7 +109,13 @@ GHC_PLUGINS = [
 # This makes it easier for users to just configure their Plugins
 # and always get the latest core GHC_PLUGINS without having to upgrade
 # their config.
-GHC_USER_PLUGINS = []
+GHC_USER_PLUGINS = [
+    # Probes
+    'GeoHealthCheck.plugins.probe.sla',
+
+    # Checkers
+    'GeoHealthCheck.plugins.check.slachecks',
+]
 
 # Default Probe to assign on "add" per Resource-type
 GHC_PROBE_DEFAULTS = {
