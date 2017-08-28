@@ -50,6 +50,8 @@ from factory import Factory
 from util import render_template2, send_email
 import views
 
+from GeoHealthCheck.plugins.check.slachecks import SLATestResultsHelper
+
 # Module globals for convenience
 LOGGER = logging.getLogger(__name__)
 APP = App.get_app()
@@ -431,7 +433,7 @@ def get_resource_by_id(identifier):
     """show resource"""
 
     response = views.get_resource_by_id(identifier)
-    return render_template('resource.html', resource=response)
+    return render_template('resource.html', resource=response, Thelp = SLATestResultsHelper(response.last_run.message))
 
 
 @APP.route('/register', methods=['GET', 'POST'])

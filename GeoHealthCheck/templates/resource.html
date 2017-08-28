@@ -71,16 +71,6 @@
                 </td>
             </tr>
             <tr>
-                <th>SLA compliance</th>
-                <td>
-                    {% if 1 %}
-                    <button type="button" class="btn btn-success btn-circle"><i class="fa fa-check"></i></button>
-                    {% else %}
-                    <button title="{{ run.message }}" type="button" class="btn btn-danger btn-circle btn"><i class="fa fa-times"></i></button>
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
                 <th>{{ _('Reliability') }}</th>
                 <td>
                     <button class="btn btn-{{ resource.reliability| cssize_reliability }} btn-sm nohover">{{ resource.reliability|round2 }}%</button>
@@ -98,7 +88,7 @@
                 <ul>
                     <li>{{ _('Last Check') }} : {{ resource.last_run.checked_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') }} </li>
                     <li>{{ _('Success') }}: {{ resource.last_run.success }} </li>
-                    <li>{{ _('Message') }}: {{ resource.last_run.message }} </li>
+                    <!-- <li>{{ _('Message') }}: {{ resource.last_run.message }} </li> -->
                     <li>{{ _('Response Time') }}: {{ resource.last_run.response_time|round(2) }} </li>
                 </ul>
             {% else %}
@@ -109,20 +99,11 @@
         </div>
     </div>
 
-
     <div class="clearfix"></div>
     <div id="run-chart" class="run-chart"></div>
-    
-    {% if 1 %}
-        <div class="clearfix"></div>
-        <h2>OGC Test Validation Report:</h2>
-        <div>
-            <iframe style="width: 100%; height: 500px;" src="http://localhost:8088/teamengine/reports/forest/s0001/html/"></iframe>
-        </div>
-    {% endif %}
     <br>
     <br>
-    
+
     <div>
         <h2 class="sub-header">{{ _('History') }} <a class="btn btn-default btn-xs" href="{{ url_for('json-resource-history', identifier=resource.identifier) }}"><span class="fa fa-download"></span> JSON</a> <a class="btn btn-default btn-xs" href="{{ url_for('csv-resource-history', identifier=resource.identifier) }}"><span class="fa fa-download"></span> CSV</a></h2>
         <table id="resource-table" class="table table-striped table-bordered table-hover">
@@ -148,6 +129,35 @@
             </tbody>
         </table>
     </div>
+
+    <!-- TEAM Engine Test Resuls -->
+    {% if Thelp.is_xml_response() %}
+    <br>
+    <br>
+    <div class="clearfix"></div>
+    <div>
+        <h2>TEAM Engine Test Failures:</h2>
+        <p><b class="text-success">Passes:</b> {{ Thelp.get_passes().length }}</p>
+        <p><b class="text-danger">Failures:</b> {{ Thelp.get_failures().length }}</p>
+        {% for test in Thelp.get_failures() %} 
+            <div class="well" style="margin: 2pc;">
+                <h4><b>Name:</b> {{ test.get('name') }}</h4> 
+                <p>{{ Thelp.show(test.get('data-provider'), '') }}</p>
+                <p>{{ Thelp.show(test.get('description'), '') }}</p>
+                <h4>Error:</h4>
+                <pre>
+                    {{ test.find('exception').find('message').text }}
+                </pre>
+                {% if test.find('attribute').length %}
+                    <h4>Attribute:</h4>
+                    {{ test.find('attribute').text() }}
+                {% endif %}
+                <div></div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endif %}
 </div>
 {% endblock %}
 {% block extrafoot %}

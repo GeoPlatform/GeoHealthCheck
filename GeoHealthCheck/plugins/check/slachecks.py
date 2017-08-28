@@ -1,16 +1,19 @@
 import sys
-# import views
-import models
 
-from pdb import set_trace as bp
-
-from owslib.etree import etree
+from pyquery import PyQuery
 from GeoHealthCheck.plugin import Plugin
 from GeoHealthCheck.check import Check
 try:
     from html import escape  # python 3.x
 except ImportError:
     from cgi import escape  # python 2.x
+
+#-# imported for this plugin #-#
+# import models
+import requests
+import os
+# from owslib.etree import etree
+from pdb import set_trace as bp
 
 """ Contains basic Check classes for a Probe object."""
 
@@ -28,6 +31,13 @@ class SlaOGCTestValidation(Check):
     DESCRIPTION = 'Test the service for validation '
 
     PARAM_DEFS = {
+        'TEAM Engine endpoint': {
+            'type': 'string',
+            'description': 'URL endpoint for the TEAM Engine service',
+            'default': 'http://cite.opengeospatial.org/teamengine/',
+            'required': True,
+            'range': None
+        },
         'Frequency': {
             'type': 'string',
             'description': 'How often should we run tests to check compliance?',
@@ -38,17 +48,10 @@ class SlaOGCTestValidation(Check):
         'Time': {
             'type': 'string',
             'description': 'What time should we run the test?',
-            'default': None,
+            'default': '3:00AM',
             'required': True,
-            'range': ['1:00AM','2:00AM','3:00AM','4:00AM', '5:00AM', '6:00AM', '7:00AM', '8:00AM' ]
-        },
-        # 'Test name': {
-        #     'type': 'string',
-        #     'description': 'What time should we run the test?',
-        #     'default': None,
-        #     'required': True,
-        #     'range': None
-        # }
+            'range': ['12:00PM', '1:00AM','2:00AM','3:00AM','4:00AM', '5:00AM', '6:00AM', '7:00AM', '8:00AM' ]
+        }
     }
     """Param defs"""
 
@@ -56,13 +59,56 @@ class SlaOGCTestValidation(Check):
         Check.__init__(self)
 
     def perform(self):
-        result = True
-        msg = 'OK'
+        # Wait until time matches -- Don't do now...
+        # Log in (or register) to TEAM Engine server
 
-        # Wait until time matches
         # Call to TEAM Engine to run test
+        try :
 
-        self.set_result(result, msg)
+            ##### For Testing (from file) #####
+            # lines = [];
+            # file = open(os.path.dirname(__file__) + "/../../../../results.xml")
+            # for line in file:
+            #     lines.append(line)
+
+            # text = ''.join(lines).rstrip()
+            # self.set_result(True, text)
+            ###################################
+
+            ############ The Real deal ########
+            # bp()
+            te_test_endpoint = self.get_param('TEAM Engine endpoint')
+            resource_endpoint = self.probe.response.url
+            etsCode = "wfs20"
+            etsVersion = "1.26"
+
+
+            text = None
+            try:
+                url = "%s/rest/suites/%s/%s/run?wfs=%s" % (te_test_endpoint, etsCode, etsVersion, resource_endpoint)
+                url = url.replace('//rest','/rest')
+                resp = requests.get(url)
+                text = resp.text
+            except Exception as err:
+                self.set_result(True, err)
+                return
+            ###################################
+
+            bp()
+
+            doc = PyQuery(text.encode())
+            failed = int(doc.attr('failed'))
+
+            # report a pass or a fail
+            # bp()
+            if failed > 0 :
+                self.set_result(False, text)
+            else :
+                self.set_result(True, text)
+
+        except Exception as err: 
+            print(err)
+            self.set_result(False, err)
 
 
 # ASSUMPTION: this assumes that there is an hourly (or ever so often) check being run....
@@ -93,13 +139,9 @@ class SlaVerifyUptime(Check):
         reliability = self.probe._resource.reliability
         min_rel = int(str(self._parameters['Minimum Uptime']).replace('%',''))
 
-        result = True;
-        msg = "OK"       
         if reliability < min_rel :
-            result = False
-            msg = "Service did not meet minimum SLA uptime requirement"
+            self.set_result(False, "Service did not meet minimum SLA uptime requirement")
       
-        self.set_result(result, msg)
 
 
 class SlaPreformant(Check):
@@ -135,3 +177,38 @@ class SlaPreformant(Check):
     # get record of uptime...
     # get average
     # see if its above the given average...
+
+
+class SLATestResultsHelper(object):
+    """
+    Helper class for reading and manipulating Test results saved from TEAM Engine
+    test suite runs.
+    """
+
+    def __init__(self, message):
+        self.RESP = message
+        try:
+            self.DOC = PyQuery(self.RESP.encode())
+        except Exception as err:
+            print err
+            self.DOC = None
+
+    def is_xml_response(self):
+        return self.DOC is not None
+
+    def get_passes(self):
+        if self.is_xml_response():
+            return self.DOC.find('[status="PASS"]')
+        else: 
+            return []
+
+
+    def get_failures(self):
+        if self.is_xml_response():
+            return self.DOC.find('[status="FAIL"]')
+        else: 
+            return []
+        
+    # Return default if empty
+    def show(self, obj, other): 
+        return obj if obj <> None else other  

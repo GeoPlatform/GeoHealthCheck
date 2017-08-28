@@ -34,9 +34,9 @@ class SLA(Probe):
         'GeoHealthCheck.plugins.check.slachecks.SlaVerifyUptime': {
             'default': True
         },
-        'GeoHealthCheck.plugins.check.slachecks.SlaPreformant': {
-            'default': True
-        }
+        # 'GeoHealthCheck.plugins.check.slachecks.SlaPreformant': {
+        #     'default': True
+        # }
     }
     """
     Checks avail for all specific Caps checks.
@@ -47,13 +47,4 @@ class SLA(Probe):
     def __init__(self):
         Probe.__init__(self)
 
-    # def perform_request(self):
-    #     """
-    #     Perform the SLA check.
-    #     See https://github.com/geopython/OWSLib/blob/
-    #     master/tests/doctests/wms_GeoServerCapabilities.txt
-    #     """
 
-
-    #     # Add to overall Probe result
-    #     self.result.add_result(True)
