@@ -3,6 +3,15 @@ FROM python:2.7.13-alpine
 # Thanks to http://www.sandtable.com/reduce-docker-image-sizes-using-alpine
 # FROM debian:jessie
 
+RUN apk add --update \
+    libxml2 \
+    libxslt \
+    libxslt-dev \
+    libxml2-dev \
+    python-dev
+    # zlib1g
+ 
+
 # Credits to yjacolin for providing first versions
 LABEL original_developer "yjacolin <yves.jacolin@camptocamp.com>"
 LABEL maintainer "Just van den Broecke <justb4@gmail.com>"
@@ -22,7 +31,7 @@ ENV ADMIN_EMAIL admin.istrator@mydomain.com
 ENV SQLALCHEMY_DATABASE_URI 'sqlite:////GeoHealthCheck/DB/data.db'
 ENV SECRET_KEY 'd544ccc37dc3ad214c09b1b7faaa64c60351d5c8bb48b342'
 ENV GHC_RETENTION_DAYS 30
-ENV GHC_RUN_FREQUENCY 'hourly'
+ENV GHC_RUN_FREQUENCY 'daily'
 ENV GHC_SELF_REGISTER False
 ENV GHC_NOTIFICATIONS False
 ENV GHC_NOTIFICATIONS_VERBOSITY True
