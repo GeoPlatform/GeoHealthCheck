@@ -1,9 +1,19 @@
 import random
-import traceback
+
+# tmp: test workround for loading from this file
+import sys
+sys.path.insert(0,'/Users/forestg/dev/OGC/GeoHealthCheck')
 
 from GeoHealthCheck.probe import Probe
 from GeoHealthCheck.result import Result
 from owslib.wms import WebMapService
+
+import traceback
+import requests
+import os
+import urllib
+import re
+
 
 
 class SLA(Probe):
@@ -23,7 +33,7 @@ class SLA(Probe):
     REQUEST_METHOD = 'GET'
 
     # PARAM_DEFS = {}
-    
+
     CHECKS_AVAIL = {
         'GeoHealthCheck.plugins.check.checks.HttpStatusNoError': {
             'default': True
@@ -48,3 +58,45 @@ class SLA(Probe):
         Probe.__init__(self)
 
 
+
+
+
+class TeamEngineAPI(object):
+    
+    ENDPOINT = None
+    UNAME = None
+    password = None
+    COOKIEJAR = None
+    
+    def __init__(self, endpoint):
+        self.ENDPOINT = endpoint
+        self.touch()
+
+    def touch(self):
+        resp = requests.get(self.ENDPOINT + 'viewSessions.jsp')
+        self.COOKIEJAR = resp.cookies
+
+    def register(self, uname, password):
+        payload = (('disclaimer', 'on'), \
+                    ('username', uname), \
+                    ('password', password), \
+                    ('repeat_password', password))
+        resp = requests.post(self.ENDPOINT + 'registrationHandler', data=payload, cookies=self.COOKIEJAR)
+        self.COOKIEJAR = resp.cookies
+        return resp
+
+    def authenticate(self, uname, password):
+        payload = (('j_username', uname),('j_password', password))
+        resp = requests.post(self.ENDPOINT + 'j_security_check', data=payload, cookies=self.COOKIEJAR)
+        self.COOKIEJAR = resp.cookies
+        return resp
+
+
+
+
+######### Testing #########
+# api = TeamEngineAPI('http://localhost:8088/teamengine/')
+# resp = api.register('newguy11', 'mypass11')
+# print resp.text
+# api.authenticate('forest1', 'forest12')
+# print api.COOKIEJAR

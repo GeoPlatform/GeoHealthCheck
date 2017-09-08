@@ -12,8 +12,11 @@ except ImportError:
 # import models
 import requests
 import os
+import urllib
+import re
 # from owslib.etree import etree
 from pdb import set_trace as bp
+import traceback
 
 """ Contains basic Check classes for a Probe object."""
 
@@ -38,19 +41,43 @@ class SlaOGCTestValidation(Check):
             'required': True,
             'range': None
         },
+        'Test to Run': {
+            'type': 'string',
+            'description': 'What test would you like to run?',
+            # 'default': 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
+            'required': True,
+            'range': ['OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
+                    'GeoPackage 1.0 Conformance Test Suite [gpkg10/1.0]',
+                    'SensorThings API (STA) [sta10/1.0]',
+                    'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
+                    'KML 2.2 Conformance Test Suite [kml22/1.12]',
+                    'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1 [gml32/1.25]']
+        },
         'Frequency': {
             'type': 'string',
             'description': 'How often should we run tests to check compliance?',
             'default': 'Every 3 Days',
             'required': True,
-            'range': [ 'Every 1 Day', 'Every 3 Days', 'Every 1 Week', 'Every 2 Weeks', 'Every 1 Month' ]
+            'range': ['Every 1 Day', 
+                    'Every 3 Days', 
+                    'Every 1 Week', 
+                    'Every 2 Weeks', 
+                    'Every 1 Month']
         },
         'Time': {
             'type': 'string',
             'description': 'What time should we run the test?',
             'default': '3:00AM',
             'required': True,
-            'range': ['12:00PM', '1:00AM','2:00AM','3:00AM','4:00AM', '5:00AM', '6:00AM', '7:00AM', '8:00AM' ]
+            'range': ['12:00PM', 
+                    '1:00AM',
+                    '2:00AM',
+                    '3:00AM',
+                    '4:00AM',
+                    '5:00AM',
+                    '6:00AM',
+                    '7:00AM',
+                    '8:00AM']
         }
     }
     """Param defs"""
@@ -70,41 +97,53 @@ class SlaOGCTestValidation(Check):
             # file = open(os.path.dirname(__file__) + "/../../../../results.xml")
             # for line in file:
             #     lines.append(line)
-
+            # 
             # text = ''.join(lines).rstrip()
             # self.set_result(True, text)
             ###################################
 
             ############ The Real deal ########
-            # bp()
             te_test_endpoint = self.get_param('TEAM Engine endpoint')
-            resource_endpoint = self.probe.response.url
-            etsCode = "wfs20"
-            etsVersion = "1.26"
+            te_test_name = self.get_param('Test to Run')
+            te_test_params = re.match(".+\[(.+)\]", te_test_name).groups()[0]
+            
+            # Must URL encode '&' chars per TEAM Engine documentation : 
+            #   http://opengeospatial.github.io/teamengine/users.html
+            resource_endpoint = self.probe.response.url.replace('&','%26')
 
-
-            text = None
             try:
-                url = "%s/rest/suites/%s/%s/run?wfs=%s" % (te_test_endpoint, etsCode, etsVersion, resource_endpoint)
-                url = url.replace('//rest','/rest')
-                resp = requests.get(url)
+                url = ("%s/rest/suites/%s/run?wfs=%s" % (te_test_endpoint, te_test_params, resource_endpoint)).replace('//rest','/rest')
+                cleanUrl = url.replace('https', 'http').replace('//rest','/rest')
+                print cleanUrl
+                resp = requests.get(cleanUrl)
                 text = resp.text
+
+                # If the test ran without issue
+                if resp.status_code == requests.codes.ok:
+                    doc = PyQuery(text.encode())
+                    failed = int(doc.attr('failed'))
+
+                    # report a pass or a fail
+                    if failed > 0 :
+                        self.set_result(False, text)
+                    else :
+                        self.set_result(True, text)
+
+                # Error happened running test
+                else:
+                    print text
+                    self.set_result(False, text)
+
             except Exception as err:
-                self.set_result(True, err)
+                print err
+                traceback.print_stack()
+                self.set_result(False, err)
                 return
             ###################################
 
-            bp()
-
-            doc = PyQuery(text.encode())
-            failed = int(doc.attr('failed'))
-
-            # report a pass or a fail
             # bp()
-            if failed > 0 :
-                self.set_result(False, text)
-            else :
-                self.set_result(True, text)
+
+
 
         except Exception as err: 
             print(err)
