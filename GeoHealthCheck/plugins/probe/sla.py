@@ -11,7 +11,7 @@ from owslib.wms import WebMapService
 import traceback
 import requests
 import os
-import urllib
+from pyquery import PyQuery
 import re
 
 
@@ -71,10 +71,13 @@ class TeamEngineAPI(object):
     def __init__(self, endpoint):
         self.ENDPOINT = endpoint
         self.touch()
+        
+    def saveCookies(self, resp):
+        self.COOKIEJAR = resp.cookies
 
     def touch(self):
         resp = requests.get(self.ENDPOINT + 'viewSessions.jsp')
-        self.COOKIEJAR = resp.cookies
+        self.saveCookies(resp)
 
     def register(self, uname, password):
         payload = (('disclaimer', 'on'), \
@@ -82,20 +85,44 @@ class TeamEngineAPI(object):
                     ('password', password), \
                     ('repeat_password', password))
         resp = requests.post(self.ENDPOINT + 'registrationHandler', data=payload, cookies=self.COOKIEJAR)
-        self.COOKIEJAR = resp.cookies
+        self.saveCookies(resp)
         return resp
 
     def authenticate(self, uname, password):
         payload = (('j_username', uname),('j_password', password))
         resp = requests.post(self.ENDPOINT + 'j_security_check', data=payload, cookies=self.COOKIEJAR)
-        self.COOKIEJAR = resp.cookies
+        self.saveCookies(resp)
         return resp
 
+    """
+    Return format:
+        [('{Test name}', '{etsCode}/{etsVersion}'),...]
+    Example:
+        [('GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1', 'gml32/1.23'),...]
+    """
+    def getAvailableTests(self):
+        resp = requests.get(self.ENDPOINT + 'rest/suites')
+        doc = PyQuery(resp.text.encode())
+
+        yeah = []
+        for r in doc('[href]'):
+            yeah.append((r.text, r.get('id').replace('-','/')))
+        return yeah
+
+    # def runTest(self); # Run test as user... so we have a record of it
+
+    # def listTestResults(self):
+
+    # def getLatestTestResult(self):
+    # self.listTestResults(self) #...
+    # Will have to filter by somthing here.... 
 
 
 
 ######### Testing #########
-# api = TeamEngineAPI('http://localhost:8088/teamengine/')
+api = TeamEngineAPI('http://localhost:8088/teamengine/')
+print api.getAvailableTests()
+
 # resp = api.register('newguy11', 'mypass11')
 # print resp.text
 # api.authenticate('forest1', 'forest12')
