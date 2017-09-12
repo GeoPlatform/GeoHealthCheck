@@ -120,8 +120,8 @@ class TeamEngineAPI(object):
 
 
 ######### Testing #########
-api = TeamEngineAPI('http://localhost:8088/teamengine/')
-print api.getAvailableTests()
+# api = TeamEngineAPI('http://localhost:8088/teamengine/')
+# print api.getAvailableTests()
 
 # resp = api.register('newguy11', 'mypass11')
 # print resp.text

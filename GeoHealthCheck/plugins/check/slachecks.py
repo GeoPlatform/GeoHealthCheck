@@ -14,7 +14,9 @@ import requests
 import os
 import urllib
 import re
-# from owslib.etree import etree
+
+from GeoHealthCheck.plugins.sla import TeamEngineAPI
+
 from pdb import set_trace as bp
 import traceback
 
@@ -103,6 +105,10 @@ class SlaOGCTestValidation(Check):
             ###################################
 
             ############ The Real deal ########
+            bp()
+
+
+
             te_test_endpoint = self.get_param('TEAM Engine endpoint')
             te_test_name = self.get_param('Test to Run')
             te_test_params = re.match(".+\[(.+)\]", te_test_name).groups()[0]
