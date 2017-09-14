@@ -43,21 +43,33 @@ class SlaOGCTestValidation(Check):
         Check.__init__(self)
 
     def perform(self):
-        # TODO: Wait until time matches -- Don't do now...
-        bp()
+        # uname = self.probe._resource.owner_identifier
+        # owner = User.query.filter_by(username=uname).first()        
 
-        uname = self.probe._resource.owner_identifier
-        owner = User.query.filter_by(username=uname).first()        
+        # NOTE: This implementation will all change once
+        # Team Engine get API endpoints for retrievig the data
+
+        # If the test ran without issue
+        if self.probe.response.status_code == self.probe.response.codes.ok:
+            doc = PyQuery(self.probe.response.text.encode())
+            failed = int(doc.attr('failed'))
+    
+            # report a pass or a fail
+            if failed > 0 :
+                self.set_result(False, text)
+            else :
+                self.set_result(True, text)
+    
+        # Error happened running test
+        else:
+            print text
+            self.set_result(False, text)
 
         # Register user if they have not already been registerd in Team Engine
         # try:
         #     api = TeamEngineAPI(self.get_param('TEAM Engine endpoint'))
         #     api.register(owner.username, owner.password)
         #     api.authenticate(owner.username, owner.password)
-
-
-        #     # TODO: Run test here.....
-
 
         # except Exception as err:
         #     print err

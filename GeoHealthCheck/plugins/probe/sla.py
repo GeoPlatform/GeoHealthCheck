@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from GeoHealthCheck.probe import Probe
 from GeoHealthCheck.result import Result
-from owslib.wms import WebMapService
 
 import requests
 import os
@@ -97,26 +96,11 @@ class SLA_Compliance(Probe):
         uname = self._resource.owner_identifier
         owner = User.query.filter_by(username=uname).first() 
 
-        # Register user if they have not already been registerd in Team Engine
-        try:
-            api = TeamEngineAPI(self.get_param('TEAM Engine endpoint'))
-            api.register(owner.username, owner.password)
-            api.authenticate(owner.username, owner.password)
-
-
-            # TODO: Run test here.....
-
-
-        except Exception as err:
-            print err
-            traceback.print_stack()
-
-
         ######### Run the Test #########
         result = Result(False, 'Guilty till proven innocent')
         result.start() # start the timer
 
-        # ##### For Testing (from file) #####
+        ###### For Testing (from file) #####
         try :
             lines = [];
             file = open(os.path.dirname(__file__) + "/../../../../results.xml")
@@ -124,15 +108,28 @@ class SLA_Compliance(Probe):
                 lines.append(line)
 
             text = ''.join(lines).rstrip()
-            result.set(True, text)
+            
+            # Make our own mock for testing here!
+            self.response = requests.Response
+            self.response.text = text
+            self.response.status_code = 200
 
+            result.set(True, text)
         except Exception as err: 
             print(err)
             result.set(False, err)
+        # finally:
+        #     result.stop()
+        #     self.result.add_result(result)
         ###################################
 
         ############ The Real deal ############
         # try:
+        #     # Register user if they have not already been registerd in Team Engine  
+        #     api = TeamEngineAPI(self.get_param('TEAM Engine endpoint'))
+        #     api.register(owner.username, owner.password)
+        #     api.authenticate(owner.username, owner.password)
+
         #     te_test_endpoint = self.get_param('TEAM Engine endpoint')
         #     te_test_name = self.get_param('Test to Run')
         #     te_test_params = re.match(".+\[(.+)\]", te_test_name).groups()[0]
@@ -148,6 +145,7 @@ class SLA_Compliance(Probe):
         #     print cleanUrl
 
         #     resp = requests.get(cleanUrl)
+        #     self.response = resp
         #     result.set(True, resp.text)
         #     bp()
 
@@ -155,12 +153,11 @@ class SLA_Compliance(Probe):
         #     print err
         #     traceback.print_stack()
         #     result.set(False, err)
+        
+        # finally:
+        #     result.stop()
+        #     self.result.add_result(result)
         ###################################
-
-
-        finally:
-            result.stop()
-            self.result.add_result(result)
 
 
 
