@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
+
+# tmp: test workround for loading from this file
+import sys
+sys.path.insert(0,'/Users/forestg/dev/OGC/GeoHealthCheck')
+
 from GeoHealthCheck.probe import Probe
 from GeoHealthCheck.result import Result
 
+from pyquery import PyQuery
 import requests
 import os
 import urllib
 import re
-
-from pyquery import PyQuery
+import time
 
 # User managment
 from GeoHealthCheck.models import User
@@ -16,9 +21,6 @@ from GeoHealthCheck.models import User
 from pdb import set_trace as bp
 import traceback
 
-# tmp: test workround for loading from this file
-# import sys
-# sys.path.insert(0,'/Users/forestg/dev/OGC/GeoHealthCheck')
 
 class SLA_Compliance(Probe):
     """
@@ -38,7 +40,8 @@ class SLA_Compliance(Probe):
         'TEAM Engine endpoint': {
             'type': 'string',
             'description': 'URL endpoint for the TEAM Engine service',
-            'default': 'http://cite.opengeospatial.org/teamengine/',
+            # 'default': 'http://cite.opengeospatial.org/teamengine/',
+            'default': 'http://teamengine/teamengine/',
             'required': True,
             'range': None
         },
@@ -304,7 +307,9 @@ class TeamEngineAPI(object):
                     ('password', password), \
                     ('repeat_password', password))
         # NOTE: we do not save cookie after registration as it prevents immediate login
-        return requests.post(self.ENDPOINT + 'registrationHandler', data=payload, cookies=self.COOKIEJAR)
+        return requests.post(self.ENDPOINT + 'registrationHandler', \
+                            data=payload, \
+                            cookies=self.COOKIEJAR)
 
     def authenticate(self, uname, password):
         payload = (('j_username', uname),('j_password', password))
@@ -327,7 +332,59 @@ class TeamEngineAPI(object):
             yeah.append((r.text, r.get('id').replace('-','/')))
         return yeah
 
-    # def runTest(self); # Run test as user... so we have a record of it
+    def runTest(self, standard, url): # Run test as user.. so we have a record of it
+        standard = 'OGC_Web Feature Service (WFS)_2.0_1.22'
+
+        try:
+            # Stage 1 - create test session
+            payload = (('Organization', 'OGC'), \
+                        ('Standard', standard), \
+                        ('mode', 'test'), \
+                        ('source', standard))
+            resp1 = requests.post(self.ENDPOINT + '', \
+                    data=payload, \
+                    cookies=self.COOKIEJAR)
+            # DO NOT SAVE COOKIE HERE!
+
+            # Make get call to get back threadId
+            #http://localhost:8088/teamengine/test?te-operation=Test&mode=test&sources=OGC_Web Feature Service (WFS)_2.0_1.22&suite=&description=Optional+Description+here
+            threadXmlEndpoint = self.ENDPOINT \
+                        + 'test?te-operation=Test&mode=test&sources=' \
+                        + standard + '&suite=' \
+                        + '&description=test'
+            
+            resp2 = requests.get(threadXmlEndpoint, cookies=self.COOKIEJAR)
+            threadXml = PyQuery(resp2.text.encode())
+            threadId = threadXml[0].get('id')
+            sessionId = threadXml[0].get('sessionId')
+
+            # Stage 2 - run the test?
+            payload = (('te-operation','SubmitForm'), \
+                        ('fid', ''), \
+                        ('te-thread', threadId), \
+                        # ('wfs-doc', ''), \
+                        ('wfs-uri', url))
+
+            resp3 = requests.post(self.ENDPOINT + 'test', \
+                                    data=payload, \
+                                    cookies=self.COOKIEJAR)
+
+            # Stage 3 - ask for status.... a few time
+            checkEndpoint = self.ENDPOINT + "test?te-operation=GetStatus" \
+                                +' &thread=' + threadId
+            for i in range(3):
+                time.sleep(1)
+                requests.get(checkEndpoint, cookies=self.COOKIEJAR)
+            
+            # Stage 4 - Resume the Session
+            resumeEndpoint = self.ENDPOINT + "test.jsp?mode=resume&session=" + sessionId
+            requests.get(resumeEndpoint, cookies=self.COOKIEJAR)
+
+        except Exception as err:
+            print err
+            traceback.print_stack(err)
+
+
 
     # def listTestResults(self):
 
@@ -340,10 +397,8 @@ class TeamEngineAPI(object):
 
 
 ######### Testing #########
-# api = TeamEngineAPI('http://localhost:8088/teamengine/')
-# print api.getAvailableTests()
-
-# resp = api.register('newguy11', 'mypass11')
-# print resp.text
-# api.authenticate('forest1', 'forest12')
-# print api.COOKIEJAR
+api = TeamEngineAPI('http://localhost:8088/teamengine/')
+api.register('forest1', 'forest12')
+api.authenticate('forest1', 'forest12')
+api.runTest('OGC_Web Feature Service (WFS)_2.0_1.22', \
+        'http://cite.deegree.org/deegree-webservices-3.4-RC3/services/wfs200?service=WFS&request=GetCapabilities')
