@@ -9,7 +9,7 @@ except ImportError:
 from pyquery import PyQuery
 import os
 import urllib
-import re
+import requests
 
 # User managment
 from GeoHealthCheck.models import User
@@ -50,86 +50,21 @@ class SlaOGCTestValidation(Check):
         # Team Engine get API endpoints for retrievig the data
 
         # If the test ran without issue
-        if self.probe.response.status_code == self.probe.response.codes.ok:
+        if self.probe.response.status_code == requests.codes.ok:
             doc = PyQuery(self.probe.response.text.encode())
             failed = int(doc.attr('failed'))
     
             # report a pass or a fail
             if failed > 0 :
-                self.set_result(False, text)
+                self.set_result(False, self.probe.response.text )
             else :
-                self.set_result(True, text)
+                self.set_result(True, self.probe.response.text )
     
         # Error happened running test
         else:
-            print text
-            self.set_result(False, text)
+            print self.probe.response.text
+            self.set_result(False, self.probe.response.text )
 
-        # Register user if they have not already been registerd in Team Engine
-        # try:
-        #     api = TeamEngineAPI(self.get_param('TEAM Engine endpoint'))
-        #     api.register(owner.username, owner.password)
-        #     api.authenticate(owner.username, owner.password)
-
-        # except Exception as err:
-        #     print err
-        #     traceback.print_stack()
-
-        # ##### For Testing (from file) #####
-        # try :
-        #     lines = [];
-        #     file = open(os.path.dirname(__file__) + "/../../../../results.xml")
-        #     for line in file:
-        #         lines.append(line)
-
-        #     text = ''.join(lines).rstrip()
-        #     self.set_result(True, text)
-
-        # except Exception as err: 
-        #     print(err)
-        #     self.set_result(False, err)
-        ###################################
-
-
-        ############ The Real deal ########
-        # try:
-        #     te_test_endpoint = self.get_param('TEAM Engine endpoint')
-        #     te_test_name = self.get_param('Test to Run')
-        #     te_test_params = re.match(".+\[(.+)\]", te_test_name).groups()[0]
-        # 
-        #     # Must URL encode '&' chars per TEAM Engine documentation : 
-        #     #   http://opengeospatial.github.io/teamengine/users.html
-        #     resource_endpoint = self.probe.response.url.replace('&','%26')
-        # 
-        # 
-        #     url = ("%s/rest/suites/%s/run?wfs=%s" % (te_test_endpoint, te_test_params, resource_endpoint)).replace('//rest','/rest')
-        #     cleanUrl = url.replace('https', 'http').replace('//rest','/rest')
-        #     print cleanUrl
-        #     # resp = requests.get(cleanUrl)
-        #     # text = resp.text
-        # 
-        #     # If the test ran without issue
-        #     if resp.status_code == requests.codes.ok:
-        #         doc = PyQuery(text.encode())
-        #         failed = int(doc.attr('failed'))
-        # 
-        #         # report a pass or a fail
-        #         if failed > 0 :
-        #             self.set_result(False, text)
-        #         else :
-        #             self.set_result(True, text)
-        # 
-        #     # Error happened running test
-        #     else:
-        #         print text
-        #         self.set_result(False, text)
-        # 
-        # except Exception as err:
-        #     print err
-        #     traceback.print_stack()
-        #     self.set_result(False, err)
-        #     return
-        ###################################
 
 
 

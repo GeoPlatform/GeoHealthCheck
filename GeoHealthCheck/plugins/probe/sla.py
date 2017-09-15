@@ -108,7 +108,7 @@ class SLA_Compliance(Probe):
                 lines.append(line)
 
             text = ''.join(lines).rstrip()
-            
+
             # Make our own mock for testing here!
             self.response = requests.Response
             self.response.text = text
@@ -117,10 +117,11 @@ class SLA_Compliance(Probe):
             result.set(True, text)
         except Exception as err: 
             print(err)
+            traceback.print_stack()
             result.set(False, err)
-        # finally:
-        #     result.stop()
-        #     self.result.add_result(result)
+        finally:
+            result.stop()
+            self.result.add_result(result)
         ###################################
 
         ############ The Real deal ############
