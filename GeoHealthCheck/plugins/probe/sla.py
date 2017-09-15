@@ -332,6 +332,11 @@ class TeamEngineAPI(object):
             yeah.append((r.text, r.get('id').replace('-','/')))
         return yeah
 
+    def getTestStatus(self, threadId):
+        endpoint = self.ENDPOINT + 'test?te-operation=GetStatus&thread=' \
+                    + threadId
+        return requests.get(endpoint, cookies=self.COOKIEJAR)
+
     def runTest(self, standard, url): # Run test as user.. so we have a record of it
         standard = 'OGC_Web Feature Service (WFS)_2.0_1.22'
 
@@ -370,15 +375,23 @@ class TeamEngineAPI(object):
                                     cookies=self.COOKIEJAR)
 
             # Stage 3 - ask for status.... a few time
-            checkEndpoint = self.ENDPOINT + "test?te-operation=GetStatus" \
-                                +' &thread=' + threadId
-            for i in range(3):
-                time.sleep(1)
-                requests.get(checkEndpoint, cookies=self.COOKIEJAR)
+            while True:
+                resp = (self.getTestStatus(threadId)).text
+                status = PyQuery(resp.encode())
+                complete = status[0].get('complete')
+                if complete == 'true':
+                    break
+                else:
+                    print '.'
+                time.sleep(4)
             
-            # Stage 4 - Resume the Session
-            resumeEndpoint = self.ENDPOINT + "test.jsp?mode=resume&session=" + sessionId
-            requests.get(resumeEndpoint, cookies=self.COOKIEJAR)
+            
+            # Stage 4 - end the session
+            stopEndpoint = self.ENDPOINT + "?stop='true'&sessionId=" \
+                                + sessionId
+            requests.get(stopEndpoint)
+
+            print "Test complete!"
 
         except Exception as err:
             print err
@@ -397,8 +410,8 @@ class TeamEngineAPI(object):
 
 
 ######### Testing #########
-api = TeamEngineAPI('http://localhost:8088/teamengine/')
-api.register('forest1', 'forest12')
-api.authenticate('forest1', 'forest12')
-api.runTest('OGC_Web Feature Service (WFS)_2.0_1.22', \
-        'http://cite.deegree.org/deegree-webservices-3.4-RC3/services/wfs200?service=WFS&request=GetCapabilities')
+# api = TeamEngineAPI('http://localhost:8088/teamengine/')
+# api.register('forest1', 'forest12')
+# api.authenticate('forest1', 'forest12')
+# api.runTest('OGC_Web Feature Service (WFS)_2.0_1.22', \
+#         'http://cite.deegree.org/deegree-webservices-3.4-RC3/services/wfs200?service=WFS&request=GetCapabilities')
