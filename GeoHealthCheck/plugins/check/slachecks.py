@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from GeoHealthCheck.plugin import Plugin
 from GeoHealthCheck.check import Check
 try:
@@ -7,6 +8,7 @@ except ImportError:
 
 #-# imported for this plugin #-#
 from pyquery import PyQuery
+import datetime
 import os
 import requests
 
@@ -100,11 +102,61 @@ class SlaVerifyUptime(Check):
 
 
 
-class SlaPreformant(Check):
-    """
-    Things
-    """
 
+"""
+    SLA_Preformance:
+    Tests a resource to make sure it meets minimum preformance requirements
+
+    Standards are set as following:
+    - Initial Response : max time 3 Seconds
+    - 470 Kilobytes image (e.g. 800 × 600 color 8 bits): max time 5 seconds
+    - Download Service Metadata operation: max time 10 seconds
+    - Get Spatial Data Set/Get Spatial Object
+        - initial response: max 30 seconds
+        - maintain : 500 Spatial Objects per second
+    - Describe Spatial Data Set/Describe Spatial Object Type
+        - initial response: max 10 seconds
+        - maintain 500 descriptions of Spatial Objects per second
+"""
+class UnderMaxResponseTime(Check):
+    NAME = "Under maximum response time"
+    DESCRIPTION = 'Check to see if a resource has responded under the ' \
+                + 'maximun allowed responce time (in seconds)'
+
+    PARAM_DEFS = {
+        'Max Response Time (seconds)': {
+            'type':'string',
+            'description': 'What is the minumum up-time percentage.',
+            'required': True,
+            'range': [ '1','2','3','4','5','6','7','8','9','10' ]
+        }
+    }
+    """Param defs"""
+
+    def __init__(self):
+        Check.__init__(self)
+
+    def perform(self):
+        start = self._result.start_time
+        if self._result.end_time:
+            end = self._result.end_time
+        else: 
+            end = datetime.datetime.utcnow()
+
+        # Elapse : respone time
+        elapse = (end-start).total_seconds()
+
+        # Target : Min resp time 
+        target = int(str(self._parameters['Max Response Time (seconds)']))
+
+        if elapse > target:
+            result = False
+            msg = 'Resource took too long to response'
+            self.set_result(result, msg)
+
+
+
+class SlaPreformant_image_download_check(Check):
     NAME = 'Verify service preformance.'
     DESCRIPTION = '{ Verify that is preformant... }'
 

@@ -118,14 +118,15 @@ class SLA_Compliance(Probe):
             print(err)
             traceback.print_stack()
             result.set(False, err)
-        finally:
-            result.stop()
-            self.result.add_result(result)
+
+        result.stop()
+        bp()
+        self.result.add_result(result)
         ###################################
 
         ############ The Real deal ############
         # try:
-        #     # Register user if they have not already been registerd in Team Engine  
+        #     # Register user if they have not already been registerd in TE 
         #     api = TeamEngineAPI(self.get_param('TEAM Engine endpoint'))
         #     api.register(owner.username, owner.password)
         #     api.authenticate(owner.username, owner.password)
@@ -139,7 +140,9 @@ class SLA_Compliance(Probe):
         #     resource_endpoint = self._resource.url.replace('&','%26')
         
         
-        #     url = ("%s/rest/suites/%s/run?wfs=%s" % (te_test_endpoint, te_test_params, resource_endpoint)).replace('//rest','/rest')
+        #     url = ("%s/rest/suites/%s/run?wfs=%s" % (te_test_endpoint, \
+        #                   te_test_params, \
+        #                   resource_endpoint)).replace('//rest','/rest')
         #     cleanUrl = url.replace('https', 'http').replace('//rest','/rest')
   
         #     print cleanUrl
@@ -181,6 +184,13 @@ class SLA_Avalability(Probe):
     CHECKS_AVAIL = {
         'GeoHealthCheck.plugins.check.checks.HttpStatusNoError': {
             'default': True
+        },
+        'GeoHealthCheck.plugins.check.slachecks.UnderMaxResponseTime': {
+            'default': True,
+            'set_params': {
+                'name': 'Max Response Time (seconds)',
+                'value': ['3>']
+            }
         }
     }
 
@@ -189,38 +199,49 @@ class SLA_Avalability(Probe):
 
 
 
-# class SLA_Preformance(Probe):
-#     """
-#         SLA_Preformance:
-#         Tests a resource to make sure it meets minimum preformance requirements
 
-#         Standards are set as following:
-#         - Initial Response : max time 3 Seconds
-#          - 470 Kilobytes image (e.g. 800 × 600 color 8 bits): max time 5 seconds
-#         - Download Service Metadata operation: max time 10 seconds
-#         - Get Spatial Data Set/Get Spatial Object
-#             - initial response: max 30 seconds
-#             - maintain : 500 Spatial Objects per second
-#         - Describe Spatial Data Set/Describe Spatial Object Type
-#             - initial response: max 10 seconds
-#             - maintain 500 descriptions of Spatial Objects per second
-#     """
-#     AUTHOR = 'ImageMattersLLC Team'
-#     NAME = 'Preformace Check'
-#     DESCRIPTION = 'Check for preformace measurement of a resource'
-#     # See enums.py for complete list
-#     RESOURCE_TYPE = '*:*'
 
-#     REQUEST_METHOD = 'GET'
+class SLA_Preformance(Probe):
+    """
+        SLA_Preformance:
+        Tests a resource to make sure it meets minimum preformance requirements
 
-#     # PARAM_DEFS = {}
+        Standards are set as following:
+        - Initial Response : max time 3 Seconds
+        - 470 Kilobytes image (e.g. 800 × 600 color 8 bits): max time 5 seconds
+        - Download Service Metadata operation: max time 10 seconds
+        - Get Spatial Data Set/Get Spatial Object
+            - initial response: max 30 seconds
+            - maintain : 500 Spatial Objects per second
+        - Describe Spatial Data Set/Describe Spatial Object Type
+            - initial response: max 10 seconds
+            - maintain 500 descriptions of Spatial Objects per second
+    """
+    AUTHOR = 'ImageMattersLLC Team'
+    NAME = 'Preformace Check'
+    DESCRIPTION = 'Check for preformace measurement of a resource'
+    # See enums.py for complete list
+    RESOURCE_TYPE = '*:*'
 
-#     CHECKS_AVAIL = {
-#         # ...
-#     }
+    REQUEST_METHOD = 'GET'
 
-#     def __init__(self):
-#         Probe.__init__(self)
+    # PARAM_DEFS = {}
+
+    CHECKS_AVAIL = {
+        # 'GeoHealthCheck.plugins.check.slachecks.SlaPreformant_initial_request_check': {
+        #     'default': True
+        # },
+        # 'GeoHealthCheck.plugins.check.slachecks.SlaPreformant_initial_request': {
+        #     'default': True
+        # }
+    }
+
+    CHECKS_AVAIL = {
+        # ...
+    }
+
+    def __init__(self):
+        Probe.__init__(self)
 
 
 # class SLA_Capacity(Probe):
@@ -231,6 +252,9 @@ class SLA_Avalability(Probe):
 
 
 
+
+
+###############################################################################
 
 
 """
@@ -302,12 +326,17 @@ class TeamEngineAPI(object):
                     ('username', uname), \
                     ('password', password), \
                     ('repeat_password', password))
-        # NOTE: we do not save cookie after registration as it prevents immediate login
-        return requests.post(self.ENDPOINT + 'registrationHandler', data=payload, cookies=self.COOKIEJAR)
+        # NOTE: we do not save cookie after registration as it prevents 
+        # immediate login
+        return requests.post(self.ENDPOINT + 'registrationHandler', \
+                    data=payload, \
+                    cookies=self.COOKIEJAR)
 
     def authenticate(self, uname, password):
         payload = (('j_username', uname),('j_password', password))
-        resp = requests.post(self.ENDPOINT + 'j_security_check', data=payload, cookies=self.COOKIEJAR)
+        resp = requests.post(self.ENDPOINT + 'j_security_check', \
+                        data=payload, \
+                        cookies=self.COOKIEJAR)
         self.saveCookies(resp)
         return resp
 
@@ -315,7 +344,8 @@ class TeamEngineAPI(object):
     Return format:
         [('{Test name}', '{etsCode}/{etsVersion}'),...]
     Example:
-        [('GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1', 'gml32/1.23'),...]
+        [('GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1', 
+            'gml32/1.23'),...]
     """
     def getAvailableTests(self):
         resp = requests.get(self.ENDPOINT + 'rest/suites')
