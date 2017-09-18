@@ -2,11 +2,14 @@
 from GeoHealthCheck.probe import Probe
 from GeoHealthCheck.result import Result
 
+from owslib.wms import WebMapService
+from pyquery import PyQuery
+
+import datetime
 import requests
 import os
+import random
 import re
-
-from pyquery import PyQuery
 
 # User managment
 from GeoHealthCheck.models import User
@@ -25,9 +28,9 @@ class SLA_Compliance(Probe):
         This runs tests against the OGC Test Engine server to verify resource
         compliance with standards.
     """
-    AUTHOR = 'ImageMattersLLC Team'
     NAME = 'OGC Standards Compliance'
     DESCRIPTION = 'Check for resource compliance against OGC standards test.'
+    AUTHOR = 'ImageMattersLLC Team'
     # See enums.py for complete list
     RESOURCE_TYPE = '*:*'
 
@@ -165,15 +168,36 @@ class SLA_Compliance(Probe):
 
 
 
+"""
+    SLA_Preformance General Rules:
+    Tests a resource to make sure it meets minimum preformance requirements
 
+    Standards are set as following:
+    - Initial Response : max time 3 Seconds
+    - 470 Kilobytes image (e.g. 800 × 600 color 8 bits): max time 5 seconds
+    - Download Service Metadata operation: max time 10 seconds
+    - Get Spatial Data Set/Get Spatial Object
+        - initial response: max 30 seconds
+        - maintain : 500 Spatial Objects per second
+    - Describe Spatial Data Set/Describe Spatial Object Type
+        - initial response: max 10 seconds
+        - maintain 500 descriptions of Spatial Objects per second
+"""
+
+
+"""
+SLA_Avalability:
+
+Run tests to make sure resource meets minimum uptime requirements.
+
+Standards are set as following:
+    - Initial Response : max time 3 Seconds
+"""
 class SLA_Avalability(Probe):
-    """
-    SLA_Avalability:
-        Run tests to make sure resource meets minimum uptime requirements.
-    """
-    AUTHOR = 'ImageMattersLLC Team'
-    NAME = 'Avaliability check'
+    NAME = 'SLA Avaliability Probe'
     DESCRIPTION = 'Check for resource meets minimum uptime requirements.'
+    AUTHOR = 'ImageMattersLLC Team'
+
     # See enums.py for complete list
     RESOURCE_TYPE = '*:*'
 
@@ -187,10 +211,6 @@ class SLA_Avalability(Probe):
         },
         'GeoHealthCheck.plugins.check.slachecks.UnderMaxResponseTime': {
             'default': True,
-            'set_params': {
-                'name': 'Max Response Time (seconds)',
-                'value': ['3>']
-            }
         }
     }
 
@@ -199,50 +219,70 @@ class SLA_Avalability(Probe):
 
 
 
+"""
+SLA_image_preformance:
 
+Check to make sure a WMS image resource retrevial is preformant 
+for a service.
 
-class SLA_Preformance(Probe):
-    """
-        SLA_Preformance:
-        Tests a resource to make sure it meets minimum preformance requirements
+Standards are set as following:
+    - 470 Kilobytes image (e.g. 800 × 600 color 8 bits): max time 5 seconds
+"""
+class SLA_image_preformance(Probe):
 
-        Standards are set as following:
-        - Initial Response : max time 3 Seconds
-        - 470 Kilobytes image (e.g. 800 × 600 color 8 bits): max time 5 seconds
-        - Download Service Metadata operation: max time 10 seconds
-        - Get Spatial Data Set/Get Spatial Object
-            - initial response: max 30 seconds
-            - maintain : 500 Spatial Objects per second
-        - Describe Spatial Data Set/Describe Spatial Object Type
-            - initial response: max 10 seconds
-            - maintain 500 descriptions of Spatial Objects per second
-    """
+    NAME = 'SLA Image Download Preformance'
+    DESCRIPTION = 'Check WMS image download preformance.'
     AUTHOR = 'ImageMattersLLC Team'
-    NAME = 'Preformace Check'
-    DESCRIPTION = 'Check for preformace measurement of a resource'
+
     # See enums.py for complete list
-    RESOURCE_TYPE = '*:*'
+    RESOURCE_TYPE = 'OGC:WMS' # Could possibly expand at some point
 
     REQUEST_METHOD = 'GET'
 
     # PARAM_DEFS = {}
 
     CHECKS_AVAIL = {
-        # 'GeoHealthCheck.plugins.check.slachecks.SlaPreformant_initial_request_check': {
-        #     'default': True
-        # },
-        # 'GeoHealthCheck.plugins.check.slachecks.SlaPreformant_initial_request': {
-        #     'default': True
-        # }
-    }
-
-    CHECKS_AVAIL = {
-        # ...
+        # Do not include "HttpStatusNoError" as we do not actually set a
+        # request (we )
+        'GeoHealthCheck.plugins.check.slachecks.UnderMaxResponseTime': {
+            'default': True,
+        }
     }
 
     def __init__(self):
         Probe.__init__(self)
 
+
+    def perform_request(self):
+
+        ######### Run the Test #########
+        result = Result(True, 'Ok')
+        result.start() # start the timer
+
+        ############ The Real deal ############
+        try:
+            wms = WebMapService(self._resource.url, version='1.3.0')
+            layers = list(wms.contents) # list of layers
+        
+            # Request image and check will make sure it happened in time
+            wms.getmap(layers=layers, # Pull all layers
+                srs='EPSG:4326',
+                bbox=(-112, 36, -106, 41),
+                size=(800, 600),
+                format='image/jpeg',
+                transparent=True)
+
+            # layer = wms[random.choice(layers)] # Random Layer
+                # styles=[layer.styles.keys()[0]],
+
+        except Exception as err:
+            print err
+            traceback.print_stack()
+            result.set(False, err)
+        
+        result.stop()
+        self.result.add_result(result)
+        ###################################
 
 # class SLA_Capacity(Probe):
     # NOT yet implemented

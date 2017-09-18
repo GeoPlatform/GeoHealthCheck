@@ -118,6 +118,14 @@ class SlaVerifyUptime(Check):
         - initial response: max 10 seconds
         - maintain 500 descriptions of Spatial Objects per second
 """
+
+
+"""
+UnderMaxResponseTime
+
+Check to see if the probe response was under a maximum response time 
+threshold.
+"""
 class UnderMaxResponseTime(Check):
     NAME = "Under maximum response time"
     DESCRIPTION = 'Check to see if a resource has responded under the ' \
@@ -137,22 +145,33 @@ class UnderMaxResponseTime(Check):
         Check.__init__(self)
 
     def perform(self):
-        start = self._result.start_time
-        if self._result.end_time:
-            end = self._result.end_time
-        else: 
-            end = datetime.datetime.utcnow()
+        try:
+            start = self.probe.result.start_time
+            if self.probe.result.end_time:
+                end = self.probe.result.end_time
+            else: 
+                end = datetime.datetime.utcnow()
 
-        # Elapse : respone time
-        elapse = (end-start).total_seconds()
+            # Elapse : respone time
+            elapse = (end-start).total_seconds()
 
-        # Target : Min resp time 
-        target = int(str(self._parameters['Max Response Time (seconds)']))
+            # Target : Min resp time 
+            max = int(str(self._parameters['Max Response Time (seconds)']))
 
-        if elapse > target:
-            result = False
-            msg = 'Resource took too long to response'
-            self.set_result(result, msg)
+            # print 'start: ' + str(start)
+            # print 'end: ' + str(end) 
+            # print 'elapse:' + str(elapse)
+            # print 'max: ' + str(max)
+            if elapse > max:
+                result = False
+                msg = 'Resource took too long to respond'
+                self.set_result(result, msg)
+
+        except Exception as err:
+            print err
+            traceback.print_stack()
+            self.set_result(False, err)    
+
 
 
 
