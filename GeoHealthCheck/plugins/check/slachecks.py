@@ -8,7 +8,6 @@ except ImportError:
 #-# imported for this plugin #-#
 from pyquery import PyQuery
 import os
-import urllib
 import requests
 
 # User managment
@@ -73,17 +72,17 @@ Check for verifying the uptime of a service
 """
 class SlaVerifyUptime(Check):
 
-    NAME = 'Verify service reliability meets minimum requirements.'
+    NAME = 'Verify service reliability meets minimum requirements (99.9%).'
     DESCRIPTION = 'Verify that service has been avaliable at a given minimum percentage rate.'
 
     PARAM_DEFS = {
-        'Minimum Uptime': {
-            'type': 'string',
-            'description': 'What is the minumum up-time percentage.',
-            'default': '75%',
-            'required': True,
-            'range': [ '98%', '95%', '90%', '85%', '80%', '75%', '70%', '65%', '60%', '55%', '50%' ]
-        }
+        # 'Minimum Uptime': {
+        #     'type': 'string',
+        #     'description': 'What is the minumum up-time percentage.',
+        #     'default': '75%',
+        #     'required': True,
+        #     'range': [ '98%', '95%', '90%', '85%', '80%', '75%', '70%', '65%', '60%', '55%', '50%' ]
+        # }
     }
     """Param defs"""
 
@@ -93,7 +92,8 @@ class SlaVerifyUptime(Check):
     def perform(self):
         # self.probe._resource.identifier
         reliability = self.probe._resource.reliability
-        min_rel = int(str(self._parameters['Minimum Uptime']).replace('%',''))
+        # min_rel = int(str(self._parameters['Minimum Uptime']).replace('%',''))
+        min_rel = 99.9
 
         if reliability < min_rel :
             self.set_result(False, "Service did not meet minimum SLA uptime requirement")

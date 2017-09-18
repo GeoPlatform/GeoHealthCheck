@@ -4,7 +4,6 @@ from GeoHealthCheck.result import Result
 
 import requests
 import os
-import urllib
 import re
 
 from pyquery import PyQuery
@@ -164,29 +163,29 @@ class SLA_Compliance(Probe):
 
 
 
-# class SLA_Avalability(Probe):
-#     """
-#     SLA_Avalability:
-#         Run tests to make sure resource meets minimum uptime requirements.
-#     """
-#     AUTHOR = 'ImageMattersLLC Team'
-#     NAME = 'Avaliability check'
-#     DESCRIPTION = 'Check for resource meets minimum uptime requirements.'
-#     # See enums.py for complete list
-#     RESOURCE_TYPE = '*:*'
+class SLA_Avalability(Probe):
+    """
+    SLA_Avalability:
+        Run tests to make sure resource meets minimum uptime requirements.
+    """
+    AUTHOR = 'ImageMattersLLC Team'
+    NAME = 'Avaliability check'
+    DESCRIPTION = 'Check for resource meets minimum uptime requirements.'
+    # See enums.py for complete list
+    RESOURCE_TYPE = '*:*'
 
-#     REQUEST_METHOD = 'GET'
+    REQUEST_METHOD = 'GET'
 
-#     # PARAM_DEFS = {}
+    # PARAM_DEFS = {}
 
-#     CHECKS_AVAIL = {
-#         'GeoHealthCheck.plugins.check.checks.HttpStatusNoError': {
-#             'default': True
-#         }
-#     }
+    CHECKS_AVAIL = {
+        'GeoHealthCheck.plugins.check.checks.HttpStatusNoError': {
+            'default': True
+        }
+    }
 
-#     def __init__(self):
-#         Probe.__init__(self)
+    def __init__(self):
+        Probe.__init__(self)
 
 
 
