@@ -93,7 +93,7 @@ class SlaVerifyUptime(Check):
     def perform(self):
         # self.probe._resource.identifier
         reliability = self.probe._resource.reliability
-        min_rel = int(str(self._parameters['Minimum Uptime']).replace('%',''))
+        min_rel = float(str(self._parameters['Minimum Uptime']).replace('%',''))
 
         if reliability < min_rel :
             self.set_result(False, "Service did not meet minimum SLA uptime requirement")
