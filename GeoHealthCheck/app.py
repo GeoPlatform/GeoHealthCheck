@@ -445,7 +445,8 @@ def get_resource_by_id(identifier):
     """show resource"""
 
     response = views.get_resource_by_id(identifier)
-    return render_template('resource.html', resource=response, Thelp = SLATestResultsHelper(response.last_run.message))
+    return render_template('resource.html', resource=response, \
+                    Thelp = SLATestResultsHelper(response.last_run.report['test_xml']))
 
 
 @APP.route('/register', methods=['GET', 'POST'])

@@ -306,8 +306,8 @@ test suite runs.
 """
 class SLATestResultsHelper(object):
 
-    def __init__(self, message):
-        self.RESP = message
+    def __init__(self, test_xml):
+        self.RESP = test_xml
         try:
             self.DOC = PyQuery(self.RESP.encode())
         except Exception as err:
