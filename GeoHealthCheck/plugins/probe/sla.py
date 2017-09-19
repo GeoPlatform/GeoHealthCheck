@@ -3,9 +3,9 @@ from GeoHealthCheck.probe import Probe
 from GeoHealthCheck.result import Result
 
 from owslib.wms import WebMapService
+from owslib.wfs import  WebFeatureService
 from pyquery import PyQuery
 
-import datetime
 import requests
 import os
 import random
@@ -211,6 +211,9 @@ class SLA_Avalability(Probe):
         },
         'GeoHealthCheck.plugins.check.slachecks.UnderMaxResponseTime': {
             'default': True,
+        },
+        'GeoHealthCheck.plugins.check.slachecks.SlaVerifyUptime': {
+            'default': True,
         }
     }
 
@@ -282,7 +285,7 @@ class SLA_image_preformance(Probe):
         
         result.stop()
         self.result.add_result(result)
-        ###################################
+
 
 # class SLA_Capacity(Probe):
     # NOT yet implemented

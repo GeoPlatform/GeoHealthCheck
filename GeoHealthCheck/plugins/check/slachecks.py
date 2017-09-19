@@ -78,13 +78,12 @@ class SlaVerifyUptime(Check):
     DESCRIPTION = 'Verify that service has been avaliable at a given minimum percentage rate.'
 
     PARAM_DEFS = {
-        # 'Minimum Uptime': {
-        #     'type': 'string',
-        #     'description': 'What is the minumum up-time percentage.',
-        #     'default': '75%',
-        #     'required': True,
-        #     'range': [ '98%', '95%', '90%', '85%', '80%', '75%', '70%', '65%', '60%', '55%', '50%' ]
-        # }
+        'Minimum Uptime': {
+            'type': 'string',
+            'description': 'What is the minumum up-time percentage.',
+            'default': '90',
+            'required': True,
+        }
     }
     """Param defs"""
 
@@ -94,8 +93,7 @@ class SlaVerifyUptime(Check):
     def perform(self):
         # self.probe._resource.identifier
         reliability = self.probe._resource.reliability
-        # min_rel = int(str(self._parameters['Minimum Uptime']).replace('%',''))
-        min_rel = 99.9
+        min_rel = int(str(self._parameters['Minimum Uptime']).replace('%',''))
 
         if reliability < min_rel :
             self.set_result(False, "Service did not meet minimum SLA uptime requirement")
@@ -172,33 +170,3 @@ class UnderMaxResponseTime(Check):
             traceback.print_stack()
             self.set_result(False, err)    
 
-
-
-
-class SlaPreformant_image_download_check(Check):
-    NAME = 'Verify service preformance.'
-    DESCRIPTION = '{ Verify that is preformant... }'
-
-    PARAM_DEFS = {
-        'PARAM?': {
-            'type': 'string',
-            'description': '{ What params??? }',
-            'default': None,
-            'required': True,
-            'range': None
-        }
-    }
-    """Param defs"""
-
-    def __init__(self):
-        Check.__init__(self)
-
-    def perform(self):
-        result = True
-        msg = 'OK'
-
-        # get record of uptime...
-        # get average
-        # see if its above the given average...
-        # 
-        self.set_result(result, msg)
