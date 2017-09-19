@@ -92,7 +92,7 @@
                 <ul>
                     <li>{{ _('Last Check') }} : {{ resource.last_run.checked_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') }} </li>
                     <li>{{ _('Success') }}: {{ resource.last_run.success }} </li>
-                    <!-- <li>{{ _('Message') }}: {{ resource.last_run.message }} </li> -->
+                    <li>{{ _('Message') }}: {{ resource.last_run.message }} </li>
                     <li>{{ _('Response Time') }}: {{ resource.last_run.response_time|round(2) }} </li>
                 </ul>
             {% else %}

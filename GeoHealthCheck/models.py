@@ -65,6 +65,7 @@ class Run(DB.Model):
                  checked_datetime=datetime.utcnow()):
         self.resource = resource
         self.success = result.success
+        self.test_xml = result.test_xml
         self.response_time = result.response_time_str
         self.checked_datetime = checked_datetime
         self.message = result.message

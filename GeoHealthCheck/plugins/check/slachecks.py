@@ -57,14 +57,14 @@ class SlaOGCTestValidation(Check):
     
             # report a pass or a fail
             if failed > 0 :
-                self.set_result(False, self.probe.response.text )
+                self.set_result(False, "OGC compliance test failed" )
             else :
-                self.set_result(True, self.probe.response.text )
+                self.set_result(True, "OGC compliance test passed")
     
         # Error happened running test
         else:
             print self.probe.response.text
-            self.set_result(False, self.probe.response.text )
+            self.set_result(False, "Invalid test results found" )
 
 
 

@@ -99,7 +99,7 @@ class SLA_Compliance(Probe):
         owner = User.query.filter_by(username=uname).first() 
 
         ######### Run the Test #########
-        result = Result(False, 'Guilty till proven innocent')
+        result = Result(False, 'Test failed to run')
         result.start() # start the timer
 
         ###### For Testing (from file) #####
@@ -116,14 +116,14 @@ class SLA_Compliance(Probe):
             self.response.text = text
             self.response.status_code = 200
 
-            result.set(True, text)
+            result.set_test_xml(text)
+            result.set(True, "Test run successfully")
         except Exception as err: 
             print(err)
             traceback.print_stack()
             result.set(False, err)
 
         result.stop()
-        bp()
         self.result.add_result(result)
         ###################################
 
@@ -152,8 +152,8 @@ class SLA_Compliance(Probe):
 
         #     resp = requests.get(cleanUrl)
         #     self.response = resp
-        #     result.set(True, resp.text)
-        #     bp()
+        #     result.set_test_xml(resp.text)
+        #     result.set(True, "Test run successfully")
 
         # except Exception as err:
         #     print err

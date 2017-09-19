@@ -9,6 +9,7 @@ class Result(object):
     def __init__(self, success=True, message='OK'):
         self.success = success
         self.message = message
+        self.test_xml = None
         self.start_time = None
         self.end_time = None
         self.response_time_secs = -1
@@ -22,6 +23,8 @@ class Result(object):
             self.success = False
             self.message = result.message
             self.results_failed.append(result)
+        if result.test_xml:
+            self.test_xml = result.test_xml
 
     def get_report(self):
         return {
@@ -33,6 +36,9 @@ class Result(object):
     def set(self, success, message):
         self.success = success
         self.message = message
+
+    def set_test_xml(self, text):
+        self.test_xml = text
 
     def start(self):
         self.start_time = datetime.datetime.utcnow()
@@ -69,6 +75,7 @@ class ResourceResult(Result):
             'url': self.resource.url,
             'success': self.success,
             'message': self.message,
+            'test_xml': self.test_xml,
             'start_time': self.start_time.strftime(
                 '%Y-%m-%dT%H:%M:%SZ'),
             'end_time': self.end_time.strftime(

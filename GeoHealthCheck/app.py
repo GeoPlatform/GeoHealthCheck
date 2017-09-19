@@ -50,7 +50,8 @@ from factory import Factory
 from util import render_template2, send_email
 import views
 
-from GeoHealthCheck.plugins.check.slachecks import SLATestResultsHelper
+from GeoHealthCheck.plugins.probe.sla import SLATestResultsHelper
+from pdb import set_trace as bp
 
 # Module globals for convenience
 LOGGER = logging.getLogger(__name__)
@@ -422,7 +423,18 @@ def resources():
 
     tag = request.args.get('tag')
 
-    query = request.args.get('q')
+    #### only return resources for authed user ###
+    if current_user.is_anonymous():
+        user = "DummyUserName1234"
+    else:
+        user = current_user.username
+
+    user_filter = "owner:" + user  
+    if request.args.get('q') is None:
+        query = user_filter
+    else:
+        query = request.args.get('q') + '&' + user_filter
+    ##############################################
 
     response = views.list_resources(resource_type, query, tag)
     return render_template('resources.html', response=response)
