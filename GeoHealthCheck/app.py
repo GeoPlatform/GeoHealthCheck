@@ -53,6 +53,10 @@ import views
 from GeoHealthCheck.plugins.probe.sla import SLATestResultsHelper
 from pdb import set_trace as bp
 
+# For testing -- allows us to save manually triggered tests
+from init import App
+import models
+
 # Module globals for convenience
 LOGGER = logging.getLogger(__name__)
 APP = App.get_app()
@@ -667,8 +671,13 @@ def test(resource_identifier):
         flash(gettext('Resource not found'), 'danger')
         return redirect(request.referrer)
 
-    result = run_test_resource(
-        resource)
+    result = run_test_resource(resource)
+
+    # For sake of demo save manually run tests
+    run1 = Run(resource, result, datetime.utcnow())
+    DB = App.get_db()
+    DB.session.add(run1)
+    db_commit()
 
     if request.method == 'GET':
         if result.message == 'Skipped':

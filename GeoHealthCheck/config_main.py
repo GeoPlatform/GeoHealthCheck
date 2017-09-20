@@ -93,13 +93,13 @@ GHC_MAP = {
 # in the module file.
 GHC_PLUGINS = [
     # Probes
-    'GeoHealthCheck.plugins.probe.owsgetcaps',
-    'GeoHealthCheck.plugins.probe.wms',
-    'GeoHealthCheck.plugins.probe.wfs',
-    'GeoHealthCheck.plugins.probe.tms',
-    'GeoHealthCheck.plugins.probe.http',
-    'GeoHealthCheck.plugins.probe.sta',
-    'GeoHealthCheck.plugins.probe.wmsdrilldown',
+    # 'GeoHealthCheck.plugins.probe.owsgetcaps',
+    # 'GeoHealthCheck.plugins.probe.wms',
+    # 'GeoHealthCheck.plugins.probe.wfs',
+    # 'GeoHealthCheck.plugins.probe.tms',
+    # 'GeoHealthCheck.plugins.probe.http',
+    # 'GeoHealthCheck.plugins.probe.sta',
+    # 'GeoHealthCheck.plugins.probe.wmsdrilldown',
 
     # Checkers
     'GeoHealthCheck.plugins.check.checks',
@@ -119,38 +119,38 @@ GHC_USER_PLUGINS = [
 
 # Default Probe to assign on "add" per Resource-type
 GHC_PROBE_DEFAULTS = {
-    'OGC:WMS': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.owsgetcaps.WmsGetCaps'
+        'OGC:WMS': {
+        'probe_class': None
     },
     'OGC:WMTS': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.owsgetcaps.WmtsGetCaps'
+        'probe_class': None
     },
     'OSGeo:TMS': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.tms.TmsCaps'
+        'probe_class': None
     },
     'OGC:WFS': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.owsgetcaps.WfsGetCaps'
+        'probe_class': None
     },
     'OGC:WCS': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.owsgetcaps.WcsGetCaps'
+        'probe_class': None
     },
     'OGC:WPS': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.owsgetcaps.WpsGetCaps'
+        'probe_class': None
     },
     'OGC:CSW': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.owsgetcaps.CswGetCaps'
+        'probe_class': None
     },
     'OGC:SOS': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.owsgetcaps.SosGetCaps'
+        'probe_class': None
     },
     'OGC:STA': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.sta.StaCaps'
+        'probe_class': None
     },
     'urn:geoss:waf': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.http.HttpGet'
+        'probe_class': None
     },
     'WWW:LINK': {
-        'probe_class': 'GeoHealthCheck.plugins.probe.http.HttpGet'
+        'probe_class': None
     },
     'FTP': {
         'probe_class': None

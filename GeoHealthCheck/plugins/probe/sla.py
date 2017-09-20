@@ -45,8 +45,8 @@ class SLA_Compliance(Probe):
             'required': True,
             'range': ['http://cite.opengeospatial.org/teamengine/',
                         'http://cite.opengeospatial.org/te2/',
-                        'http://localhost:8088/teamengine/',
-                        'http://teamengine-ets-all:8088/teamengine/']
+                        'http://teamengine-ets-all:8088/teamengine/',
+                        'http://localhost:8088/teamengine/']
         },
         'Test to Run': {
             'type': 'string',
@@ -56,6 +56,7 @@ class SLA_Compliance(Probe):
             'range': [
                 'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2 [gml32/1.21]',
                 'SensorThings API (STA) [sta10/1.0]',
+                'ets-sensorml20 [sensorml20/0.6]'
                 'OWS Context 1.0 Conformance Test Suite [owc10/0.1]',
                 # 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
                 'OGC KML 2.x Conformance Test Suite [kml2/0.5]', 
@@ -67,7 +68,6 @@ class SLA_Compliance(Probe):
                 # 'Conformance Test Suite - OGC Web Map Service 1.3.0 [wms/1.23]',
                 'Conformance Test Suite - OGC Web Feature Service 1.0.0 [wfs/1.12]',
                 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
-                'ets-sensorml20 [sensorml20/0.6]'
                 ]
             # 'range': ['OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
             #         'GeoPackage 1.0 Conformance Test Suite [gpkg10/1.0]',
