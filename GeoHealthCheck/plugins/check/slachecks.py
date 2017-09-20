@@ -52,19 +52,25 @@ class SlaOGCTestValidation(Check):
 
         # If the test ran without issue
         if self.probe.response.status_code == requests.codes.ok:
-            doc = PyQuery(self.probe.response.text.encode())
-            failed = int(doc.attr('failed'))
-    
-            # report a pass or a fail
-            if failed > 0 :
-                self.set_result(False, "OGC compliance test failed" )
-            else :
-                self.set_result(True, "OGC compliance test passed")
+            try:
+                doc = PyQuery(self.probe.response.text.encode())
+                failed = int(doc.attr('failed'))
+        
+                # report a pass or a fail
+                if failed > 0 :
+                    self.set_result(False, "OGC compliance test failed" )
+                else:
+                    self.set_result(True, "OGC compliance test passed")
+                    
+            except Exception as err: 
+                print err
+                traceback.print_stack()
+                self.set_result(False, "Invalid test results")
     
         # Error happened running test
         else:
             print self.probe.response.text
-            self.set_result(False, "Invalid test results found" )
+            self.set_result(False, "Invalid test results" )
 
 
 

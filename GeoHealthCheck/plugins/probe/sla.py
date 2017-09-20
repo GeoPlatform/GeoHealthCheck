@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+# tmp: test workround for loading from this file
+# import sys
+# sys.path.insert(0,'/Users/forestg/dev/OGC/GeoHealthCheck')
+
 from GeoHealthCheck.probe import Probe
 from GeoHealthCheck.result import Result
 
@@ -18,17 +23,13 @@ from GeoHealthCheck.models import User
 from pdb import set_trace as bp
 import traceback
 
-# tmp: test workround for loading from this file
-# import sys
-# sys.path.insert(0,'/Users/forestg/dev/OGC/GeoHealthCheck')
-
 class SLA_Compliance(Probe):
     """
     SLA_Compliance:
         This runs tests against the OGC Test Engine server to verify resource
         compliance with standards.
     """
-    NAME = 'OGC Standards Compliance'
+    NAME = 'OGC Standards Compliance Test'
     DESCRIPTION = 'Check for resource compliance against OGC standards test.'
     AUTHOR = 'ImageMattersLLC Team'
     # See enums.py for complete list
@@ -42,46 +43,39 @@ class SLA_Compliance(Probe):
             'description': 'URL endpoint for the TEAM Engine service',
             'default': 'http://cite.opengeospatial.org/teamengine/',
             'required': True,
-            'range': None
+            'range': ['http://cite.opengeospatial.org/teamengine/',
+                        'http://cite.opengeospatial.org/te2/',
+                        'http://localhost:8088/teamengine/',
+                        'http://teamengine-ets-all:8088/teamengine/']
         },
         'Test to Run': {
             'type': 'string',
             'description': 'What test would you like to run?',
             # 'default': 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
             'required': True,
-            'range': ['OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
-                    'GeoPackage 1.0 Conformance Test Suite [gpkg10/1.0]',
-                    'SensorThings API (STA) [sta10/1.0]',
-                    'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
-                    'KML 2.2 Conformance Test Suite [kml22/1.12]',
-                    'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1 [gml32/1.25]']
-        },
-        # 'Frequency': {
-        #     'type': 'string',
-        #     'description': 'How often should we run tests to check compliance?',
-        #     'default': 'Every 3 Days',
-        #     'required': True,
-        #     'range': ['Every 1 Day', 
-        #             'Every 3 Days', 
-        #             'Every 1 Week', 
-        #             'Every 2 Weeks', 
-        #             'Every 1 Month']
-        # },
-        # 'Time': {
-        #     'type': 'string',
-        #     'description': 'What time should we run the test?',
-        #     'default': '3:00AM',
-        #     'required': True,
-        #     'range': ['12:00PM', 
-        #             '1:00AM',
-        #             '2:00AM',
-        #             '3:00AM',
-        #             '4:00AM',
-        #             '5:00AM',
-        #             '6:00AM',
-        #             '7:00AM',
-        #             '8:00AM']
-        # }
+            'range': [
+                'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2 [gml32/1.21]',
+                'SensorThings API (STA) [sta10/1.0]',
+                'OWS Context 1.0 Conformance Test Suite [owc10/0.1]',
+                # 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
+                'OGC KML 2.x Conformance Test Suite [kml2/0.5]', 
+                'KML 2.2 Conformance Test Suite [kml22/1.12]',
+                'GeoPackage 1.2 Conformance Test Suite [gpkg12/0.1]',
+                'GeoPackage 1.0 Conformance Test Suite [gpkg10/1.0]',
+                # These services do not return the same format as other tests
+                # 'Conformance Test Suite - OGC Web Map Service 1.1 [wms/1.16]',
+                # 'Conformance Test Suite - OGC Web Map Service 1.3.0 [wms/1.23]',
+                'Conformance Test Suite - OGC Web Feature Service 1.0.0 [wfs/1.12]',
+                'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
+                'ets-sensorml20 [sensorml20/0.6]'
+                ]
+            # 'range': ['OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
+            #         'GeoPackage 1.0 Conformance Test Suite [gpkg10/1.0]',
+            #         'SensorThings API (STA) [sta10/1.0]',
+            #         'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
+            #         'KML 2.2 Conformance Test Suite [kml22/1.12]',
+            #         'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1 [gml32/1.25]']
+        }
     }
 
     CHECKS_AVAIL = {
@@ -93,6 +87,7 @@ class SLA_Compliance(Probe):
     def __init__(self):
         Probe.__init__(self)
 
+
     def perform_request(self):
 
         uname = self._resource.owner_identifier
@@ -103,66 +98,79 @@ class SLA_Compliance(Probe):
         result.start() # start the timer
 
         ###### For Testing (from file) #####
-        try :
-            lines = [];
-            file = open(os.path.dirname(__file__) + "/../../../../results.xml")
-            for line in file:
-                lines.append(line)
+        # try :
+        #     lines = [];
+        #     file = open(os.path.dirname(__file__) + "/../../../../results.xml")
+        #     for line in file:
+        #         lines.append(line)
 
-            text = ''.join(lines).rstrip()
+        #     text = ''.join(lines).rstrip()
 
-            # Make our own mock for testing here!
-            self.response = requests.Response
-            self.response.text = text
-            self.response.status_code = 200
+        #     # Make our own mock for testing here!
+        #     self.response = requests.Response
+        #     self.response.text = text
+        #     self.response.status_code = 200
 
-            result.set_test_xml(text)
+        #     result.set_test_xml(text)
+        #     result.set(True, "Test run successfully")
+        # except Exception as err: 
+        #     print(err)
+        #     traceback.print_stack()
+        #     result.set(False, err)
+
+        # result.stop()
+        # self.result.add_result(result)
+        ###################################
+
+        ############ The Real deal ############
+        try:
+            # Register user if they have not already been registerd in TE 
+            api = TeamEngineAPI(self.get_param('TEAM Engine endpoint'))
+            api.register(owner.username, owner.password)
+            api.authenticate(owner.username, owner.password)
+
+            te_test_endpoint = self.get_param('TEAM Engine endpoint')
+            te_test_name = self.get_param('Test to Run')
+            te_test_params = re.match(".+\[(.+)\]", te_test_name).groups()[0]
+        
+            # Must URL encode '&' chars per TEAM Engine documentation : 
+            #   http://opengeospatial.github.io/teamengine/users.html
+            resource_endpoint = self._resource.url.replace('&','%26')
+        
+
+            # Get the test param matched to the test being run
+            def get_param(test):
+                switcher = {
+                    'wms/1.16': 'capabilities-url',
+                    'wms/1.23': 'capabilities-url',
+                    'wfs/1.12': 'capabilities-url',
+                    'wfs20/1.26': 'wfs',
+                    'gml32/1.21': 'gml',
+                    'kml2/0.5': 'kml'
+                }
+                # Others will return default for these
+                return switcher.get(test, 'iut') # With a default
+
+
+            url = ("%s/rest/suites/%s/run?%s=%s" % (te_test_endpoint, \
+                                                    te_test_params, \
+                                                    get_param(te_test_params),\
+                                                    resource_endpoint))
+            cleanUrl = url.replace('https', 'http').replace('//rest','/rest')
+            print cleanUrl
+
+            resp = requests.get(cleanUrl)
+            self.response = resp
+            result.set_test_xml(resp.text)
             result.set(True, "Test run successfully")
-        except Exception as err: 
-            print(err)
+
+        except Exception as err:
+            print err
             traceback.print_stack()
             result.set(False, err)
 
         result.stop()
         self.result.add_result(result)
-        ###################################
-
-        ############ The Real deal ############
-        # try:
-        #     # Register user if they have not already been registerd in TE 
-        #     api = TeamEngineAPI(self.get_param('TEAM Engine endpoint'))
-        #     api.register(owner.username, owner.password)
-        #     api.authenticate(owner.username, owner.password)
-
-        #     te_test_endpoint = self.get_param('TEAM Engine endpoint')
-        #     te_test_name = self.get_param('Test to Run')
-        #     te_test_params = re.match(".+\[(.+)\]", te_test_name).groups()[0]
-        
-        #     # Must URL encode '&' chars per TEAM Engine documentation : 
-        #     #   http://opengeospatial.github.io/teamengine/users.html
-        #     resource_endpoint = self._resource.url.replace('&','%26')
-        
-        
-        #     url = ("%s/rest/suites/%s/run?wfs=%s" % (te_test_endpoint, \
-        #                   te_test_params, \
-        #                   resource_endpoint)).replace('//rest','/rest')
-        #     cleanUrl = url.replace('https', 'http').replace('//rest','/rest')
-  
-        #     print cleanUrl
-
-        #     resp = requests.get(cleanUrl)
-        #     self.response = resp
-        #     result.set_test_xml(resp.text)
-        #     result.set(True, "Test run successfully")
-
-        # except Exception as err:
-        #     print err
-        #     traceback.print_stack()
-        #     result.set(False, err)
-        
-        # finally:
-        #     result.stop()
-        #     self.result.add_result(result)
         ###################################
 
 
