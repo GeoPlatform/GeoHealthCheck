@@ -1,7 +1,10 @@
+    {% if user and user.is_authenticated() %}
     <h1 class="page-header">{{ _('Dashboard') }}</h1>
+
     {% if response['first_run'].checked_datetime and response['last_run'].checked_datetime %}
     <h3 class="page-header">{{ _('Monitoring Period') }}: {{ response['first_run'].checked_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') }} - {{ response['last_run'].checked_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') }}</h3>
     {% endif %}
+
     <div class="row col-md-offset-0">
      <div class="col-lg-3 col-md-6">
             <div class="panel panel-green">
@@ -67,3 +70,8 @@
         {% endif %}
         <div class="col-lg-3 col-md-6" id="all-resources-map"></div>
     </div>
+    {% elif user and not user.is_authenticated() %}
+    <div>
+        <h1>Please log in to see your resources</h1>
+    </div>
+    {% endif %}

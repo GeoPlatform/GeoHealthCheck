@@ -104,7 +104,7 @@ def list_resources(resource_type=None, query=None, tag=None):
 def get_resource_by_id(identifier):
     """return one resource by identifier"""
     return models.Resource.query.filter_by(
-        identifier=identifier).first_or_404()
+        identifier=identifier).filter(*models.get_user_filter()).first_or_404()
 
 
 def get_resource_types_counts():

@@ -46,6 +46,7 @@ from healthcheck import sniff_test_resource, run_test_resource
 from init import App
 from enums import RESOURCE_TYPES
 from models import Resource, Run, ProbeVars, CheckVars, Tag, User
+import models
 from factory import Factory
 from util import render_template2, send_email
 import views
@@ -220,8 +221,9 @@ def context_processors():
 def home():
     """homepage"""
 
+    print current_user.is_authenticated()
     response = views.get_health_summary()
-    return render_template('home.html', response=response)
+    return render_template('home.html', response=response, user=current_user)
 
 
 @APP.route('/csv', endpoint='csv')
@@ -469,6 +471,8 @@ def register():
     DB.session.add(user)
     try:
         DB.session.commit()
+        # register with TeamEngine as well
+        
     except Exception as err:
         DB.session.rollback()
         bad_column = err.message.split()[2]
@@ -493,8 +497,10 @@ def add():
     resource_type = request.form['resource_type']
     tags = request.form.getlist('tags')
     url = request.form['url'].strip()
+    # bp()
     resource = Resource.query.filter_by(resource_type=resource_type,
-                                        url=url).first()
+                                        url=url).filter(*models.get_user_filter()).first()
+    # Allow for duplicate resource registration (differnet users)
     if resource is not None:
         msg = gettext('Service already registered')
         flash('%s (%s, %s)' % (msg, resource_type, url), 'danger')
@@ -666,7 +672,7 @@ def update(resource_identifier):
 @login_required
 def test(resource_identifier):
     """test a resource"""
-    resource = Resource.query.filter_by(identifier=resource_identifier).first()
+    resource = Resource.query.filter_by(identifier=resource_identifier).filter(*models.get_user_filter()).first()
     if resource is None:
         flash(gettext('Resource not found'), 'danger')
         return redirect(request.referrer)
@@ -699,7 +705,7 @@ def test(resource_identifier):
 @login_required
 def edit_resource(resource_identifier):
     """edit a resource"""
-    resource = Resource.query.filter_by(identifier=resource_identifier).first()
+    resource = Resource.query.filter_by(identifier=resource_identifier).filter(*models.get_user_filter()).first()
     if resource is None:
         flash(gettext('Resource not found'), 'danger')
         return redirect(request.referrer)
@@ -714,7 +720,7 @@ def edit_resource(resource_identifier):
 @login_required
 def delete(resource_identifier):
     """delete a resource"""
-    resource = Resource.query.filter_by(identifier=resource_identifier).first()
+    resource = Resource.query.filter_by(identifier=resource_identifier).filter(*models.get_user_filter()).first()
     if g.user.role != 'admin' and g.user.username != resource.owner.username:
         msg = gettext('You do not have access to delete this resource')
         flash(msg, 'danger')

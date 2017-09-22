@@ -357,9 +357,15 @@ class User(DB.Model):
     def __repr__(self):
         return '<User %r>' % (self.username)
 
+
+def get_username():
+    return current_user.username if current_user.get_id() is not None else "?"
+
 def get_user_filter():
-    owner = current_user.username if current_user.get_id() is not None else "?"
-    return ('owner_identifier = "' + owner + '"',)
+    return ('owner_identifier = "' + get_username() + '"',)
+
+# def get_user_filter_for_RUN():
+#     # have to do a join
 
 def get_resource_types_counts():
     """return frequency counts and totals of registered resource types"""

@@ -11,18 +11,20 @@
 {% endblock %}
 
 {% block extrabody %}
-    <p>
-        {{ _('Select a link on the left to view Resources.') }}
-    </p>
-    <h2>{{ _('Failing Resources') }}</h2>
-    {% set resources = response['failed_resources'] %}
-    <div>
-    {% if resources|length > 0 %}
-    {% include 'includes/resources_list.html' %}
-    {% else %}
-    {{ _('None') }}!
+    {% if user and user.is_authenticated() %}
+        <p>
+            {{ _('Select a link on the left to view Resources.') }}
+        </p>
+        <h2>{{ _('Failing Resources') }}</h2>
+        {% set resources = response['failed_resources'] %}
+        <div>
+        {% if resources|length > 0 %}
+        {% include 'includes/resources_list.html' %}
+        {% else %}
+        {{ _('None') }}!
+        {% endif %}
+        </div>
     {% endif %}
-    </div>
 
 </div>
 {% endblock %}

@@ -140,7 +140,8 @@ class UnderMaxResponseTime(Check):
             'type':'string',
             'description': 'What is the minumum up-time percentage.',
             'required': True,
-            'range': [ '1','2','3','4','5','6','7','8','9','10' ]
+            'range': [ '1','2','3','4','5','6','7','8','9','10' ],
+            'default': '3'
         }
     }
     """Param defs"""
