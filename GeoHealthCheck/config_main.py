@@ -119,7 +119,7 @@ GHC_USER_PLUGINS = [
 
 # Default Probe to assign on "add" per Resource-type
 GHC_PROBE_DEFAULTS = {
-        'OGC:WMS': {
+    'OGC:WMS': {
         'probe_class': None
     },
     'OGC:WMTS': {

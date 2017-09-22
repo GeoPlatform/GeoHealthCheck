@@ -41,6 +41,10 @@ from factory import Factory
 from init import App
 from notifications import notify
 
+from flask_login import (current_user)
+
+from pdb import set_trace as bp
+
 DB = App.get_db()
 LOGGER = logging.getLogger(__name__)
 
@@ -353,14 +357,21 @@ class User(DB.Model):
     def __repr__(self):
         return '<User %r>' % (self.username)
 
+def get_user_filter():
+    owner = current_user.username if current_user.get_id() is not None else "?"
+    return ('owner_identifier = "' + owner + '"',)
 
 def get_resource_types_counts():
     """return frequency counts and totals of registered resource types"""
 
     mrt = Resource.resource_type
     return [
-        DB.session.query(mrt, func.count(mrt)).group_by(mrt),
-        DB.session.query(mrt).count()
+        DB.session.query(mrt, func.count(mrt))
+            .filter(*get_user_filter())
+            .group_by(mrt)
+       ,DB.session.query(mrt)
+            .filter(*get_user_filter())
+            .count()
     ]
 
 
@@ -405,9 +416,7 @@ def get_last_runs(count):
 def get_tag_counts():
     """return counts of all tags"""
 
-    query = DB.session.query(Tag.name,
-                             DB.func.count(Resource.identifier)).join(
-        Resource.tags).group_by(Tag.id)
+    query = DB.session.query(Tag.name, DB.func.count(Resource.identifier)) .filter(*get_user_filter()) .join(Resource.tags) .group_by(Tag.id)
     return dict(query)
 
 

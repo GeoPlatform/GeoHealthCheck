@@ -7,6 +7,28 @@
         <div class="probe-detail resource-probe-edit" style="display: none">
             <table class="table resource-probe-data table-condensed table-bordered" data-probe-class="{{ probe.probe_class }}">
                 <tr>
+                    <td class="resource-probe-checks check-edit-forms">
+                        <strong>Probe Checks</strong>
+                        {% if not probe.check_vars %}
+                        <!-- Get default Checks with values for Probe -->
+
+                            <!--{% for check_info in probe_info.CHECKS_AVAIL %}-->
+                               <!--{% if check_info.PARAM_DEFS['default'] %}-->
+                                   <!--{% include 'includes/check_edit_form.html' %}-->
+                               <!--{% endif %}-->
+                            <!--{% endfor %}-->
+
+                        <br/><span>This Probe has no Checks yet (or none avail).</span>
+                        {% else %}
+
+                            {% for check in probe.check_vars %}
+                               {% set check_info = probe_info.CHECKS_AVAIL[check.check_class] %}
+                               {% include 'includes/check_edit_form.html' %}
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
                      <td>
                          <strong>Probe Parameters</strong>
                          {% if not probe.parameters %}
@@ -69,30 +91,8 @@
                      </td>
                  </tr>
                 <tr>
-                     <td class="resource-probe-checks check-edit-forms">
-                         <strong>Probe Checks</strong>
-                         {% if not probe.check_vars %}
-                         <!-- Get default Checks with values for Probe -->
-
-                             <!--{% for check_info in probe_info.CHECKS_AVAIL %}-->
-                                <!--{% if check_info.PARAM_DEFS['default'] %}-->
-                                    <!--{% include 'includes/check_edit_form.html' %}-->
-                                <!--{% endif %}-->
-                             <!--{% endfor %}-->
-
-                         <br/><span>This Probe has no Checks yet (or none avail).</span>
-                         {% else %}
-
-                             {% for check in probe.check_vars %}
-                                {% set check_info = probe_info.CHECKS_AVAIL[check.check_class] %}
-                                {% include 'includes/check_edit_form.html' %}
-                             {% endfor %}
-                         {% endif %}
-                     </td>
-                 </tr>
-                <tr>
                      <td>
-                         <strong>Checks Available</strong>
+                         <!-- <strong>Checks Available</strong>
                          {% if not probe_info.CHECKS_AVAIL %}
                           <br/><span>No Checks available (maybe internal Checking).</span>
                           {% else %}
@@ -113,7 +113,7 @@
 
                          {% endfor %}
                           </table>
-                         {% endif %}
+                         {% endif %} -->
                      </td>
                  </tr>
 

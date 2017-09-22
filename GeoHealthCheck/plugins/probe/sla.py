@@ -45,7 +45,7 @@ class SLA_Compliance(Probe):
             'required': True,
             'range': ['http://cite.opengeospatial.org/teamengine/',
                         'http://cite.opengeospatial.org/te2/',
-                        'http://teamengine-ets-all:8088/teamengine/',
+                        'http://teamengine:8088/teamengine/',
                         'http://localhost:8088/teamengine/']
         },
         'Test to Run': {

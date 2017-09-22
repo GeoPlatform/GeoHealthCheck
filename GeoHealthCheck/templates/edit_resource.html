@@ -55,7 +55,13 @@
                 </td>
 
             </tr>
+
+
+
+            <!-- Remove if able: if default probes get set (seems system only allow one currently) -->
+
             <tr>
+                <div id="probe-buffer" class="height: 5em;"></div>
                 <th>Probes<br/>Available</th>
 
                 <td>
@@ -65,6 +71,12 @@
                 </td>
 
             </tr>
+            <!-- End section to remove -->
+
+
+
+
+
             {% if g.user.role == 'admin' or g.user.username == resource.owner.username %}
             <tr>
                 <th>{{ _('Status') }}</th>
