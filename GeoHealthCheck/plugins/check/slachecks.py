@@ -7,13 +7,16 @@ except ImportError:
     from cgi import escape  # python 2.x
 
 #-# imported for this plugin #-#
-from pyquery import PyQuery
+# from pyquery import PyQuery
 import datetime
 import os
 import requests
+import re
 
 # User managment
 from GeoHealthCheck.models import User
+
+from GeoHealthCheck.plugins.probe.sla import SLATestResultsHelper
 
 # For debugging
 from pdb import set_trace as bp
@@ -53,12 +56,20 @@ class SlaOGCTestValidation(Check):
         # If the test ran without issue
         if self.probe.response.status_code == requests.codes.ok:
             try:
-                doc = PyQuery(self.probe.response.text.encode())
-                failed = int(doc.attr('failed'))
-        
+                path = self.probe.result.test_xml
+                helper = SLATestResultsHelper(path)
+
+                # Read in the file for parsing
+                with open('./Geohealthcheck' + helper.get_index(), 'r') as myfile:
+                    doc=myfile.read().replace('\n', '')
+
+                # Search raw html for the results!!!!
+                re.match(".+Number of conformance class failed\:\s(\d+).+", doc)
+                failed = int(re.match(".+Number of conformance class failed\:\s+(\d+).+", doc).groups()[0])
+
                 # report a pass or a fail
                 if failed > 0 :
-                    self.set_result(False, "OGC compliance test failed" )
+                    self.set_result(False, "OGC compliance test had " + str(failed) + " failure(s)")
                 else:
                     self.set_result(True, "OGC compliance test passed")
                     

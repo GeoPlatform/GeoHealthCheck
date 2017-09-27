@@ -3,13 +3,12 @@ FROM python:2.7.13-alpine
 # Thanks to http://www.sandtable.com/reduce-docker-image-sizes-using-alpine
 # FROM debian:jessie
 
-RUN apk add --update \
-    libxml2 \
-    libxslt \
-    libxslt-dev \
-    libxml2-dev \
-    python-dev
-    # zlib1g
+# RUN apk add --update \
+#     libxml2 \
+#     libxslt \
+#     libxslt-dev \
+#     libxml2-dev \
+#     python-dev
  
 
 # Credits to yjacolin for providing first versions
