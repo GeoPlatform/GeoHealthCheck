@@ -54,8 +54,8 @@ class SlaOGCTestValidation(Check):
         # Team Engine get API endpoints for retrievig the data
 
         # If the test ran without issue
-        if self.probe.response.status_code == requests.codes.ok:
-            try:
+        try:
+            if self.probe.response.status_code == requests.codes.ok:
                 path = self.probe.result.test_xml
                 helper = SLATestResultsHelper(path)
 
@@ -73,18 +73,15 @@ class SlaOGCTestValidation(Check):
                 else:
                     self.set_result(True, "OGC compliance test passed")
                     
-            except Exception as err: 
-                print err
-                traceback.print_stack()
-                self.set_result(False, "Invalid test results")
+            # Error happened running test
+            else:
+                print "Testing error"
+                self.set_result(False, "Testing error" )
+        except Exception as err: 
+            msg =  "Invalid test results: " + str(err)
+            print msg
+            self.set_result(False, msg)
     
-        # Error happened running test
-        else:
-            print self.probe.response.text
-            self.set_result(False, "Invalid test results" )
-
-
-
 
 """
 Check for verifying the uptime of a service

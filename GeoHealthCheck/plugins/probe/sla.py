@@ -9,12 +9,14 @@ from GeoHealthCheck.result import Result
 
 from owslib.wms import WebMapService
 from owslib.wfs import  WebFeatureService
-from pyquery import PyQuery
+# from pyquery import PyQuery
 
 import requests
 import os
 import random
 import re
+import datetime
+import zipfile
 
 # User managment
 from GeoHealthCheck.models import User
@@ -43,10 +45,11 @@ class SLA_Compliance(Probe):
             'description': 'URL endpoint for the TEAM Engine service',
             'default': 'http://cite.opengeospatial.org/teamengine/',
             'required': True,
-            'range': ['http://cite.opengeospatial.org/teamengine/',
-                        'http://cite.opengeospatial.org/te2/',
-                        'http://teamengine:8088/teamengine/',
+            'range': ['http://teamengine:8080/teamengine/',
                         'http://localhost:8088/teamengine/']
+                        # 'http://cite.opengeospatial.org/teamengine/',
+                        # 'http://cite.opengeospatial.org/te2/'
+                        
         },
         'Test to Run': {
             'type': 'string',
@@ -55,17 +58,16 @@ class SLA_Compliance(Probe):
             'required': True,
             'range': [
                 'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2 [gml32/1.21]',
-                'SensorThings API (STA) [sta10/1.0]',
+                # 'SensorThings API (STA) [sta10/1.0]',
                 'ets-sensorml20 [sensorml20/0.6]'
                 'OWS Context 1.0 Conformance Test Suite [owc10/0.1]',
-                # 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
+                'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
                 'OGC KML 2.x Conformance Test Suite [kml2/0.5]', 
                 'KML 2.2 Conformance Test Suite [kml22/1.12]',
-                'GeoPackage 1.2 Conformance Test Suite [gpkg12/0.1]',
-                'GeoPackage 1.0 Conformance Test Suite [gpkg10/1.0]',
-                # These services do not return the same format as other tests
-                # 'Conformance Test Suite - OGC Web Map Service 1.1 [wms/1.16]',
-                # 'Conformance Test Suite - OGC Web Map Service 1.3.0 [wms/1.23]',
+                # 'GeoPackage 1.2 Conformance Test Suite [gpkg12/0.1]',
+                # 'GeoPackage 1.0 Conformance Test Suite [gpkg10/1.0]',
+                'Conformance Test Suite - OGC Web Map Service 1.1 [wms/1.16]',
+                'Conformance Test Suite - OGC Web Map Service 1.3.0 [wms/1.23]',
                 'Conformance Test Suite - OGC Web Feature Service 1.0.0 [wfs/1.12]',
                 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
                 ]
@@ -90,44 +92,18 @@ class SLA_Compliance(Probe):
 
     def perform_request(self):
 
-        uname = self._resource.owner_identifier
-        owner = User.query.filter_by(username=uname).first() 
+        # owner = User.query.filter_by(username=uname).first() 
 
         ######### Run the Test #########
         result = Result(False, 'Test failed to run')
         result.start() # start the timer
 
-        ###### For Testing (from file) #####
-        # try :
-        #     lines = [];
-        #     file = open(os.path.dirname(__file__) + "/../../../../results.xml")
-        #     for line in file:
-        #         lines.append(line)
-
-        #     text = ''.join(lines).rstrip()
-
-        #     # Make our own mock for testing here!
-        #     self.response = requests.Response
-        #     self.response.text = text
-        #     self.response.status_code = 200
-
-        #     result.set_test_xml(text)
-        #     result.set(True, "Test run successfully")
-        # except Exception as err: 
-        #     print(err)
-        #     traceback.print_stack()
-        #     result.set(False, err)
-
-        # result.stop()
-        # self.result.add_result(result)
-        ###################################
-
         ############ The Real deal ############
         try:
             # Register user if they have not already been registerd in TE 
-            api = TeamEngineAPI(self.get_param('TEAM Engine endpoint'))
-            api.register(owner.username, owner.password)
-            api.authenticate(owner.username, owner.password)
+            # api = TeamEngineAPI(self.get_param('TEAM Engine endpoint'))
+            # api.register(owner.username, owner.password)
+            # api.authenticate(owner.username, owner.password)
 
             te_test_endpoint = self.get_param('TEAM Engine endpoint')
             te_test_name = self.get_param('Test to Run')
@@ -159,14 +135,36 @@ class SLA_Compliance(Probe):
             cleanUrl = url.replace('https', 'http').replace('//rest','/rest')
             print cleanUrl
 
-            resp = requests.get(cleanUrl)
+            headers = { 'Accept' : 'application/zip' }
+
+            resp = requests.get(cleanUrl, headers=headers)
+
+            # Save response zip to file
+            uname = self._resource.owner_identifier
+            resource_id = self._resource.identifier
+
+            file_name = uname + '_' + str(resource_id) + "_" + str(datetime.datetime.now())
+            path = './Geohealthcheck/static/site/' + file_name
+            with open(path + '.zip', 'wb') as f:
+                f.write(resp.content)
+
+            # Go ahead and unzip in static directory to serve (HTTP)
+            zip = zipfile.ZipFile(path + '.zip', 'r')
+            zip.extractall(path)
+            zip.close()
+
+            # print resp.content
             self.response = resp
-            result.set_test_xml(resp.text)
+            result.set_test_xml(path)
             result.set(True, "Test run successfully")
 
+        except requests.ConnectionError as err:
+            msg = "Error connecting to TeamEngine service at:  [" + te_test_endpoint + "]"
+            print msg
+            result.set(False, msg)
         except Exception as err:
             print err
-            traceback.print_stack()
+            # traceback.print_stack()
             result.set(False, err)
 
         result.stop()
@@ -314,29 +312,23 @@ test suite runs.
 """
 class SLATestResultsHelper(object):
 
-    def __init__(self, test_xml):
-        self.RESP = test_xml
-        try:
-            self.DOC = PyQuery(self.RESP.encode())
-        except Exception as err:
-            print err
-            self.DOC = None
+    def __init__(self, path):
+        self.PATH = path
 
-    def is_xml_response(self):
-        return self.DOC is not None
+    # Credit:
+    # http://code.activestate.com/recipes/577027-find-file-in-subdirectory/
+    def findInSubdirectory(self, filename, subdirectory=''):
+        if subdirectory:
+            path = subdirectory
+        else:
+            path = os.getcwd()
+        for root, dirs, names in os.walk(path):
+            if filename in names:
+                return os.path.join(root, filename)
+        raise 'File not found'
 
-    def get_passes(self):
-        if self.is_xml_response():
-            return self.DOC.find('[status="PASS"]')
-        else: 
-            return []
-
-
-    def get_failures(self):
-        if self.is_xml_response():
-            return self.DOC.find('[status="FAIL"]')
-        else: 
-            return []
+    def get_index(self):
+        return self.findInSubdirectory('index.html', self.PATH).replace('./Geohealthcheck','')
         
     # Return default if empty
     def show(self, obj, other): 
@@ -400,7 +392,7 @@ class TeamEngineAPI(object):
     """
     def getAvailableTests(self):
         resp = requests.get(self.ENDPOINT + 'rest/suites')
-        doc = PyQuery(resp.text.encode())
+        # doc = PyQuery(resp.text.encode())
 
         yeah = []
         for r in doc('[href]'):
