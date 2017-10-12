@@ -45,10 +45,11 @@ class SLA_Compliance(Probe):
             'description': 'URL endpoint for the TEAM Engine service',
             'default': 'http://cite.opengeospatial.org/teamengine/',
             'required': True,
-            'range': ['http://teamengine:8080/teamengine/',
-                        'http://localhost:8088/teamengine/']
+            'range': [  'http://cite.opengeospatial.org/te2/']
+                        # 'http://teamengine:8080/teamengine/',
                         # 'http://cite.opengeospatial.org/teamengine/',
-                        # 'http://cite.opengeospatial.org/te2/'
+                        # 'http://localhost:8088/teamengine/']
+                      
                         
         },
         'Test to Run': {
@@ -58,25 +59,21 @@ class SLA_Compliance(Probe):
             'required': True,
             'range': [
                 'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2 [gml32/1.21]',
-                # 'SensorThings API (STA) [sta10/1.0]',
-                'ets-sensorml20 [sensorml20/0.6]'
-                'OWS Context 1.0 Conformance Test Suite [owc10/0.1]',
                 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
-                'OGC KML 2.x Conformance Test Suite [kml2/0.5]', 
-                'KML 2.2 Conformance Test Suite [kml22/1.12]',
-                # 'GeoPackage 1.2 Conformance Test Suite [gpkg12/0.1]',
-                # 'GeoPackage 1.0 Conformance Test Suite [gpkg10/1.0]',
-                'Conformance Test Suite - OGC Web Map Service 1.1 [wms/1.16]',
-                'Conformance Test Suite - OGC Web Map Service 1.3.0 [wms/1.23]',
-                'Conformance Test Suite - OGC Web Feature Service 1.0.0 [wfs/1.12]',
                 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
                 ]
-            # 'range': ['OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
-            #         'GeoPackage 1.0 Conformance Test Suite [gpkg10/1.0]',
-            #         'SensorThings API (STA) [sta10/1.0]',
-            #         'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
-            #         'KML 2.2 Conformance Test Suite [kml22/1.12]',
-            #         'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1 [gml32/1.25]']
+                # 'Conformance Test Suite - OGC Web Map Service 1.1 [wms/1.16]',
+                # 'Conformance Test Suite - OGC Web Map Service 1.3.0 [wms/1.23]',
+                # 'Conformance Test Suite - OGC Web Feature Service 1.0.0 [wfs/1.12]',
+
+                # 'ets-sensorml20 [sensorml20/0.6]'
+                # 'OWS Context 1.0 Conformance Test Suite [owc10/0.1]',
+                # 'OGC KML 2.x Conformance Test Suite [kml2/0.5]', 
+                # 'KML 2.2 Conformance Test Suite [kml22/1.12]',
+
+                # 'SensorThings API (STA) [sta10/1.0]',
+                # 'GeoPackage 1.2 Conformance Test Suite [gpkg12/0.1]',
+                # 'GeoPackage 1.0 Conformance Test Suite [gpkg10/1.0]',
         }
     }
 

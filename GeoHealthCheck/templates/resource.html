@@ -6,6 +6,11 @@
 {% endblock %}
 
 {% block body %}
+<script>
+        function resizeIframe(obj) {
+          obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+        }
+</script>
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1 class="page-header"><span id="resource_title_h1">{{ resource.title }}</span>    </h1>
         <h1 class="page-header">{% if g.user.is_authenticated() %}
@@ -135,33 +140,17 @@
     </div>
 
     <!-- TEAM Engine Test Resuls -->
-    {% if Thelp.is_xml_response() %}
-    <br>
-    <br>
-    <div class="clearfix"></div>
     <div>
-        <h2>TEAM Engine Test Failures:</h2>
-        <p><b class="text-success">Passes:</b> {{ Thelp.get_passes().length }}</p>
-        <p><b class="text-danger">Failures:</b> {{ Thelp.get_failures().length }}</p>
-        {% for test in Thelp.get_failures() %} 
-            <div class="well" style="margin: 2pc;">
-                <h4><b>Name:</b> {{ test.get('name') }}</h4> 
-                <p>{{ Thelp.show(test.get('data-provider'), '') }}</p>
-                <p>{{ Thelp.show(test.get('description'), '') }}</p>
-                <h4>Error:</h4>
-                <pre>
-                    {{ test.find('exception').find('message').text }}
-                </pre>
-                {% if test.find('attribute').length %}
-                    <h4>Attribute:</h4>
-                    {{ test.find('attribute').text() }}
-                {% endif %}
-                <div></div>
-            </div>
-        {% endfor %}
+        <br>
+        <br>
+        <br>
+        <h1>TEAM Engine Test Results: <a href="{{Thelp.get_index()}}" target="_blank"><span class="fa fa-external-link"></span></a></h1>
+        <iframe src="{{Thelp.get_index()}}" style="width: 100%; height: 30em;" onload="resizeIframe(this)"></iframe>
+        <br>
+        <br>
+        <br>
     </div>
 
-{% endif %}
 </div>
 {% endblock %}
 {% block extrafoot %}

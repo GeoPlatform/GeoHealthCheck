@@ -25,7 +25,10 @@ case ${DB_TYPE} in
 			echo "Creating SQLite DB tables..."
 			create_db
 		else
-			echo "NOT creating SQLite DB tables..."
+			# echo "NOT creating SQLite DB tables..."
+			echo "RE-CREATING SQLite DB..."
+			rm -f /GeoHealthCheck/DB/data.db
+			create_db
 		fi
 	    ;;
 
