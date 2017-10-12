@@ -141,7 +141,12 @@ class SLA_Compliance(Probe):
             resource_id = self._resource.identifier
 
             file_name = uname + '_' + str(resource_id) + "_" + str(datetime.datetime.now())
-            path = './Geohealthcheck/static/site/' + file_name
+
+            # Allow path to be passed in
+            # print(os.environ['STATIC_HOME'])
+            path = os.environ['STATIC_HOME'] + file_name
+            # print(path)
+
             with open(path + '.zip', 'wb') as f:
                 f.write(resp.content)
 
@@ -152,7 +157,7 @@ class SLA_Compliance(Probe):
 
             # print resp.content
             self.response = resp
-            result.set_test_xml(path)
+            result.set_test_xml(file_name)
             result.set(True, "Test run successfully")
 
         except requests.ConnectionError as err:
@@ -161,7 +166,7 @@ class SLA_Compliance(Probe):
             result.set(False, msg)
         except Exception as err:
             print err
-            # traceback.print_stack()
+            traceback.print_stack()
             result.set(False, err)
 
         result.stop()
@@ -309,8 +314,8 @@ test suite runs.
 """
 class SLATestResultsHelper(object):
 
-    def __init__(self, path):
-        self.PATH = path
+    def __init__(self, name):
+        self.NAME = name
 
     # Credit:
     # http://code.activestate.com/recipes/577027-find-file-in-subdirectory/
@@ -324,9 +329,16 @@ class SLATestResultsHelper(object):
                 return os.path.join(root, filename)
         raise 'File not found'
 
+    # Get index.html path from the static serve site (for HTML display)
     def get_index(self):
-        return self.findInSubdirectory('index.html', self.PATH).replace('./Geohealthcheck','')
+        full_path = os.environ['STATIC_HOME'] + self.NAME if self.NAME else ''
+        return re.sub(r'^.+/static', '/static', self.findInSubdirectory('index.html', full_path))
         
+    # Get index.html with full path (for system processing)
+    def get_index_full_path(self):
+        full_path = os.environ['STATIC_HOME'] + self.NAME if self.NAME else ''
+        return self.findInSubdirectory('index.html', full_path)
+
     # Return default if empty
     def show(self, obj, other): 
         return obj if obj <> None else other  
@@ -389,7 +401,6 @@ class TeamEngineAPI(object):
     """
     def getAvailableTests(self):
         resp = requests.get(self.ENDPOINT + 'rest/suites')
-        # doc = PyQuery(resp.text.encode())
 
         yeah = []
         for r in doc('[href]'):

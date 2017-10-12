@@ -56,11 +56,10 @@ class SlaOGCTestValidation(Check):
         # If the test ran without issue
         try:
             if self.probe.response.status_code == requests.codes.ok:
-                path = self.probe.result.test_xml
-                helper = SLATestResultsHelper(path)
+                helper = SLATestResultsHelper(self.probe.result.test_xml)
 
                 # Read in the file for parsing
-                with open('./Geohealthcheck' + helper.get_index(), 'r') as myfile:
+                with open(helper.get_index_full_path(), 'r') as myfile:
                     doc=myfile.read().replace('\n', '')
 
                 # Search raw html for the results!!!!
