@@ -16,7 +16,9 @@ import os
 import random
 import re
 import datetime
+import time
 import zipfile
+
 
 # User managment
 from GeoHealthCheck.models import User
@@ -137,17 +139,18 @@ class SLA_Compliance(Probe):
             headers = { 'Accept' : 'application/zip' }
 
             resp = requests.get(cleanUrl, headers=headers)
+            print(resp.status_code)
+            print(resp)
+            
 
             # Save response zip to file
             uname = self._resource.owner_identifier
             resource_id = self._resource.identifier
 
-            file_name = uname + '_' + str(resource_id) + "_" + str(datetime.datetime.now())
+            file_name = uname + '_' + str(resource_id) + "_" + str(time.time())
 
             # Allow path to be passed in
-            # print(os.environ['STATIC_HOME'])
             path = os.environ['STATIC_HOME'] + file_name
-            # print(path)
 
             with open(path + '.zip', 'wb') as f:
                 f.write(resp.content)
@@ -167,7 +170,7 @@ class SLA_Compliance(Probe):
             print msg
             result.set(False, msg)
         except Exception as err:
-            print err
+            print(err)
             traceback.print_stack()
             result.set(False, err)
 

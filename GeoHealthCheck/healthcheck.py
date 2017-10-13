@@ -153,7 +153,8 @@ def sniff_test_resource(config, resource_type, url):
 
         title = title.decode('utf-8')
     except Exception as err:
-        title = 'Untitled'
+        import re
+        title = re.match("^http:\/\/(.+)\/.+$", url).group(1)
         msg = 'Getting metadata failed: %s' % str(err)
         LOGGER.exception(msg)
         message = msg

@@ -28,7 +28,7 @@
 # =================================================================
 import os
 
-DEBUG = False
+DEBUG = True
 SQLALCHEMY_ECHO = False
 
 # Use Env vars via os.environ() from Dockerfile:
