@@ -18,8 +18,32 @@
     </div>
 
     <div class="form-group input-group col-sm-5">
-        <input type="text" name="url" class="form-control" placeholder="url" autofocus required>
-        <p class="help-block">Enter the URL WITH query parameters:<br/>good:<code>http://host/wms?service=WMS&version=1.1.1&request=GetCapabilities</code><br/>bad: <code>http://host/wms</code><br/></p>
+        <h4>NOTE: Only HTTP urls are allowd. No HTTPS (SSL) urls permitted.</h4>
+        <input type="text" name="url" pattern="^http:\/\/.+$" class="form-control" autofocus required>
+        <p class="help-block">
+            Enter the URL WITH query parameters:
+            <br/>good:
+                <code>http://host/wms?service=WMS&version=1.1.1&request=GetCapabilities</code>
+            <br/>bad: 
+            <code>http://host/wms</code>
+            <br/>
+        </p>
+        <script>
+            // Credit: https://stackoverflow.com/questions/19122886/how-can-i-create-a-custom-message-when-an-html5-required-input-pattern-does-not#answer-19123002
+            // function attachHandler(el, evtname, fn) {
+            //     if (el.addEventListener) {
+            //         el.addEventListener(evtname, fn.bind(el), false);
+            //     } else if (el.attachEvent) {
+            //         el.attachEvent('on' + evtname, fn.bind(el));
+            //     }
+            // }
+            // attachHandler(window, "load", function(){
+            //     var ele = document.querySelector("input[name=url]");
+            //     attachHandler(ele, "invalid", function () {
+            //         this.setCustomValidity("Only HTTP (not HTTPS) urls are allowed.");
+            //     });
+            // });
+        </script>
     </div>
     <div class="form-group input-group col-sm-5">
         <select id="tags" name="tags" class="form-control" multiple="multiple"></select>
