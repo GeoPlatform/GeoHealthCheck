@@ -120,16 +120,16 @@ GHC_USER_PLUGINS = [
 # Default Probe to assign on "add" per Resource-type
 GHC_PROBE_DEFAULTS = {
     'OGC:WMS': {
-        'probe_class': None
+        'probe_class': 'GeoHealthCheck.plugins.probe.sla.SLA_Compliance'
     },
-    'OGC:WMTS': {
-        'probe_class': None
-    },
+    # 'OGC:WMTS': {
+    #     'probe_class': None
+    # },
     # 'OSGeo:TMS': {
     #     'probe_class': None
     # },
     'OGC:WFS': {
-        'probe_class': None
+        'probe_class': 'GeoHealthCheck.plugins.probe.sla.SLA_Compliance'
     },
     # 'OGC:WCS': {
     #     'probe_class': None
@@ -138,7 +138,7 @@ GHC_PROBE_DEFAULTS = {
     #     'probe_class': None
     # },
     'OGC:CSW': {
-        'probe_class': None
+        'probe_class': 'GeoHealthCheck.plugins.probe.sla.SLA_Compliance'
     },
     # 'OGC:SOS': {
     #     'probe_class': None

@@ -43,7 +43,7 @@ class SLA_Compliance(Probe):
         'TEAM Engine endpoint': {
             'type': 'string',
             'description': 'URL endpoint for the TEAM Engine service',
-            'default': 'http://cite.opengeospatial.org/teamengine/',
+            'default': 'http://cite.opengeospatial.org/te2/',
             'required': True,
             'range': [  'http://cite.opengeospatial.org/te2/']
                         # 'http://teamengine:8080/teamengine/',
@@ -55,15 +55,15 @@ class SLA_Compliance(Probe):
         'Test to Run': {
             'type': 'string',
             'description': 'What test would you like to run?',
-            # 'default': 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
+            'default': 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
             'required': True,
             'range': [
-                'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1 [gml32/1.25]',
-                'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
                 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
+                'Conformance Test Suite - OGC Web Map Service 1.3.0 [wms/1.23]',
+                'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1 [gml32/1.25]',
+                'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]'
                 ]
                 # 'Conformance Test Suite - OGC Web Map Service 1.1 [wms/1.16]',
-                # 'Conformance Test Suite - OGC Web Map Service 1.3.0 [wms/1.23]',
                 # 'Conformance Test Suite - OGC Web Feature Service 1.0.0 [wfs/1.12]',
 
                 # 'ets-sensorml20 [sensorml20/0.6]'

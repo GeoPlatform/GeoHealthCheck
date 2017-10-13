@@ -581,7 +581,7 @@ def add():
         flash(str(err), 'danger')
         return redirect(url_for('home', lang=g.current_lang))
     else:
-        return edit_resource(resource_to_add.identifier)
+        return get_resource_by_id(resource_to_add.identifier)
 
 
 @APP.route('/resource/<int:resource_identifier>/update', methods=['POST'])
