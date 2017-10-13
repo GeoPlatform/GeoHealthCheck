@@ -125,34 +125,34 @@ GHC_PROBE_DEFAULTS = {
     'OGC:WMTS': {
         'probe_class': None
     },
-    'OSGeo:TMS': {
-        'probe_class': None
-    },
+    # 'OSGeo:TMS': {
+    #     'probe_class': None
+    # },
     'OGC:WFS': {
         'probe_class': None
     },
-    'OGC:WCS': {
-        'probe_class': None
-    },
-    'OGC:WPS': {
-        'probe_class': None
-    },
+    # 'OGC:WCS': {
+    #     'probe_class': None
+    # },
+    # 'OGC:WPS': {
+    #     'probe_class': None
+    # },
     'OGC:CSW': {
         'probe_class': None
     },
-    'OGC:SOS': {
-        'probe_class': None
-    },
-    'OGC:STA': {
-        'probe_class': None
-    },
-    'urn:geoss:waf': {
-        'probe_class': None
-    },
+    # 'OGC:SOS': {
+    #     'probe_class': None
+    # },
+    # 'OGC:STA': {
+    #     'probe_class': None
+    # },
+    # 'urn:geoss:waf': {
+    #     'probe_class': None
+    # },
     'WWW:LINK': {
         'probe_class': None
     },
-    'FTP': {
-        'probe_class': None
-    }
+    # 'FTP': {
+    #     'probe_class': None
+    # }
 }

@@ -58,7 +58,7 @@ class SLA_Compliance(Probe):
             # 'default': 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
             'required': True,
             'range': [
-                'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2 [gml32/1.21]',
+                'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1 [gml32/1.25]',
                 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
                 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
                 ]

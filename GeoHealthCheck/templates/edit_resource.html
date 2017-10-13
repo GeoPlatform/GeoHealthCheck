@@ -94,8 +94,8 @@
 
                 <td>
                     <button id="save" type="button" class="btn btn-primary btn-sm">{{ _('Save') }}</button>
-                    &nbsp;&nbsp;&nbsp;<button id="test" type="button" class="btn btn-primary btn-sm">{{ _('Test') }}</button>
-                    &nbsp;&nbsp;&nbsp;<a href="{{ url_for('get_resource_by_id', lang=g.current_lang, identifier=resource.identifier) }}"><button id="title_cancel" type="button" class="btn btn-primary btn-sm">{{ _('Cancel') }}</button></a>
+                    <!-- &nbsp;&nbsp;&nbsp;<button id="test" type="button" class="btn btn-primary btn-sm">{{ _('Test') }}</button> -->
+                    &nbsp;&nbsp;&nbsp;<a href="{{ url_for('get_resource_by_id', lang=g.current_lang, identifier=resource.identifier) }}"><button id="title_cancel" type="button" class="btn btn-primary btn-sm">Done</button></a>
                     &nbsp;&nbsp;&nbsp;<a href="{{ url_for('delete', lang=g.current_lang, resource_identifier=resource.identifier) }}"><button id="confirm-delete" type="button" class="btn btn-danger btn-sm">{{ _('Delete') }}</button></a>
                 </td>
             </tr>
