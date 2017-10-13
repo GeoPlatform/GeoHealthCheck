@@ -25,6 +25,8 @@ from GeoHealthCheck.models import User
 from pdb import set_trace as bp
 import traceback
 
+
+### Abstract Test Probe ###
 class SLA_Compliance(Probe):
     """
     SLA_Compliance:
@@ -172,6 +174,87 @@ class SLA_Compliance(Probe):
         result.stop()
         self.result.add_result(result)
         ###################################
+
+
+
+#################### Concrete test probes ####################
+
+### WFS concrete probe ####
+class SLA_Compliance_WFS(SLA_Compliance):
+    NAME = 'OGC Standards Compliance Test (WFS)'
+    DESCRIPTION = 'Check for resource compliance against OGC WFS standards test.'
+    AUTHOR = 'ImageMattersLLC Team'
+    # See enums.py for complete list
+    RESOURCE_TYPE = 'OGC:WFS'
+
+    REQUEST_METHOD = 'GET'
+
+    PARAM_DEFS = {
+        'TEAM Engine endpoint': {
+            'type': 'string',
+            'description': 'URL endpoint for the TEAM Engine service',
+            'default': 'http://cite.opengeospatial.org/te2/',
+            'required': True
+        },
+        'Test to Run': {
+            'type': 'string',
+            'description': 'What test would you like to run?',
+            'default': 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
+            'required': True
+        }
+    }  
+
+
+#### WMS concrete probe ####
+class SLA_Compliance_WMS(SLA_Compliance):
+    NAME = 'OGC Standards Compliance Test (WMS)'
+    DESCRIPTION = 'Check for resource compliance against OGC WMS standards test.'
+    AUTHOR = 'ImageMattersLLC Team'
+    # See enums.py for complete list
+    RESOURCE_TYPE = 'OGC:WMS'
+
+    REQUEST_METHOD = 'GET'
+
+    PARAM_DEFS = {
+        'TEAM Engine endpoint': {
+            'type': 'string',
+            'description': 'URL endpoint for the TEAM Engine service',
+            'default': 'http://cite.opengeospatial.org/te2/',
+            'required': True
+        },
+        'Test to Run': {
+            'type': 'string',
+            'description': 'What test would you like to run?',
+            'default': 'Conformance Test Suite - OGC Web Map Service 1.3.0 [wms/1.23]',
+            'required': True
+        }
+    }    
+
+
+#### CWS (Catalogue Conformance) Concrete Probe ####
+class SLA_Compliance_CSW(SLA_Compliance):
+    NAME = 'OGC Standards Compliance Test (WMS)'
+    DESCRIPTION = 'Check for resource compliance against OGC CSW standards test.'
+    AUTHOR = 'ImageMattersLLC Team'
+    # See enums.py for complete list
+    RESOURCE_TYPE = 'OGC:CSW'
+
+    REQUEST_METHOD = 'GET'
+
+    PARAM_DEFS = {
+        'TEAM Engine endpoint': {
+            'type': 'string',
+            'description': 'URL endpoint for the TEAM Engine service',
+            'default': 'http://cite.opengeospatial.org/te2/',
+            'required': True
+        },
+        'Test to Run': {
+            'type': 'string',
+            'description': 'What test would you like to run?',
+            'default': 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
+            'required': True
+        }
+    }  
 
 
 
