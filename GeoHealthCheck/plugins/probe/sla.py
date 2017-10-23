@@ -169,10 +169,15 @@ class SLA_Compliance(Probe):
             msg = "Error connecting to TeamEngine service at:  [" + te_test_endpoint + "]"
             print msg
             result.set(False, msg)
+        except zipfile.BadZipfile as err:
+            msg = "Invalid Zip file returned from TeamEngine server"
+            print msg
+            result.set(False, msg)
         except Exception as err:
+            print(type(err))
             print(err)
             traceback.print_stack()
-            result.set(False, err)
+            result.set(False, "Error: " + str(err))
 
         result.stop()
         self.result.add_result(result)

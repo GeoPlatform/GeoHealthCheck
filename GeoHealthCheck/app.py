@@ -561,8 +561,9 @@ def add():
                             probe_to_add, check_class, param_vals)
                         checks_to_add.append(check_vars)
 
+    # Failing on this part here is locking the database.... 
+    # should harden this at some point to prevent database from locking
     result = run_test_resource(resource_to_add)
-
     run_to_add = Run(resource_to_add, result)
 
     DB.session.add(resource_to_add)
