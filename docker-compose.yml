@@ -1,0 +1,79 @@
+# Default Compose config: runs GHC with SQLite backend and cronjobs
+version: "3"
+
+# docker-compose v2+ needs separate volumes section
+volumes:
+  # ghc_pgdb:
+  ghc_sqlitedb:
+
+services:
+  geohealthcheck:
+    # image: geopython/geohealthcheck
+    build: ./GeoHealthCheck
+    ports:
+      - 8083:80
+    # links:
+      # - teamengine:teamengine
+      # - teamengine-4-11:teamengine
+      # - teamengine-ets-all:teamengine
+      # - teamengine-ets-all-experimental:teamengine
+    environment:
+      GHC_USER_PLUGINS: 'GeoHealthCheck.plugins.probe.sla, GeoHealthCheck.plugins.check.slachecks'
+      STATIC_HOME: '/GeoHealthCheck/GeoHealthCheck/static/site/'
+    # volumes:
+      # - ghc_sqlitedb:/GeoHealthCheck/DB
+      # - ./GeoHealthCheck:/GeoHealthCheck:rw
+      # Optional Plugins, Path on the host, relative to the Compose file
+      # See htt/ps://docs.docker.com/compose/compose-file/#volumes
+      # - ./../GeoHealthCheck/plugins:/plugins:ro
+
+  geohealthcheck-cron-daily:
+    # image: geopython/geohealthcheck
+    build: ./GeoHealthCheck
+    depends_on:
+      - geohealthcheck
+    entrypoint:
+      - bash
+      - /cron-jobs-daily.sh
+    volumes:
+      - ghc_sqlitedb:/GeoHealthCheck/DB
+      # - ./GeoHealthCheck:/GeoHealthCheck:rw
+    labels:
+      io.ghc-cron-daily: 'true'
+
+  # jobber:
+  #   image: blacklabelops/jobber:docker.v1.1
+  #   depends_on:
+  #     - geohealthcheck-cron-hourly
+  #     - geohealthcheck-cron-daily
+  #   environment:
+  #     # May see warnings, see https://github.com/blacklabelops/rsnapshot/issues/2 but ok.
+  #     JOB_NAME1: ghc-cron-hourly
+  #     JOB_COMMAND1: docker start $$(docker ps -a -f label=io.ghc-cron-hourly=true --format="{{.ID}}")
+  #     JOB_TIME1: 0 0 *
+  #     JOB_NAME2: ghc-cron-daily
+  #     JOB_COMMAND2: docker start $$(docker ps -a -f label=io.ghc-cron-daily=true --format="{{.ID}}")
+  #     JOB_TIME2: 0 45 0 *
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+
+##### TEAMEngine Service #####
+  # teamengine:
+  #   image: tfr42/teamengine
+  #   ports:
+  #     - "8088:8080"
+
+  # teamengine-4-11:
+  #   image: opengis/teamengine
+  #   ports:
+  #     - "8088:8080"
+
+  # teamengine-ets-all:
+  #   image: dstenger/teamengine-ets-all
+  #   ports:
+  #     - "8088:8080"
+
+  # teamengine-ets-all-experimental:
+  #   image: dstenger/teamengine-ets-all-experimental
+  #   ports:
+  #     - "8088:8080"
