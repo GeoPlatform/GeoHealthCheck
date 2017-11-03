@@ -59,13 +59,13 @@ class SLA_Compliance(Probe):
         'Test to Run': {
             'type': 'string',
             'description': 'What test would you like to run?',
-            'default': 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
+            'default': 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.27]',
             'required': True,
             'range': [
-                'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
+                'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.27]',
                 'Conformance Test Suite - OGC Web Map Service 1.3.0 [wms/1.23]',
                 'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1 [gml32/1.25]',
-                'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]'
+                'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.1]'
                 ]
                 # 'Conformance Test Suite - OGC Web Map Service 1.1 [wms/1.16]',
                 # 'Conformance Test Suite - OGC Web Feature Service 1.0.0 [wfs/1.12]',
@@ -121,7 +121,7 @@ class SLA_Compliance(Probe):
                     'wms/1.16': 'capabilities-url',
                     'wms/1.23': 'capabilities-url',
                     'wfs/1.12': 'capabilities-url',
-                    'wfs20/1.26': 'wfs',
+                    'wfs20/1.27': 'wfs',
                     'gml32/1.21': 'gml',
                     'kml2/0.5': 'kml'
                 }
@@ -207,7 +207,7 @@ class SLA_Compliance_WFS(SLA_Compliance):
         'Test to Run': {
             'type': 'string',
             'description': 'What test would you like to run?',
-            'default': 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.26]',
+            'default': 'WFS 2.0 (ISO 19142:2010) Conformance Test Suite [wfs20/1.27]',
             'required': True
         }
     }  
