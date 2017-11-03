@@ -238,6 +238,31 @@ class SLA_Compliance_WMS(SLA_Compliance):
         }
     }    
 
+#### GML concrete probe ####
+class SLA_Compliance_GML(SLA_Compliance):
+    NAME = 'OGC Standards Compliance Test (WMS)'
+    DESCRIPTION = 'Check for resource compliance against OGC WMS standards test.'
+    AUTHOR = 'ImageMattersLLC Team'
+    # See enums.py for complete list
+    RESOURCE_TYPE = 'OGC:WMS'
+
+    REQUEST_METHOD = 'GET'
+
+    PARAM_DEFS = {
+        'TEAM Engine endpoint': {
+            'type': 'string',
+            'description': 'URL endpoint for the TEAM Engine service',
+            'default': 'http://cite.opengeospatial.org/te2/',
+            'required': True
+        },
+        'Test to Run': {
+            'type': 'string',
+            'description': 'What test would you like to run?',
+            'default': 'GML (ISO 19136:2007) Conformance Test Suite, Version 3.2.1 [gml32/1.25]',
+            'required': True
+        }
+    } 
+
 
 #### CWS (Catalogue Conformance) Concrete Probe ####
 class SLA_Compliance_CSW(SLA_Compliance):
@@ -259,7 +284,7 @@ class SLA_Compliance_CSW(SLA_Compliance):
         'Test to Run': {
             'type': 'string',
             'description': 'What test would you like to run?',
-            'default': 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.0]',
+            'default': 'OGC Catalogue 3.0 Conformance Test Suite [cat30/1.1]',
             'required': True
         }
     }  
