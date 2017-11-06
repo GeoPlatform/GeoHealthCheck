@@ -15,7 +15,7 @@
         <p>
             {{ _('Select a link on the left to view Resources.') }}
         </p>
-        <h2>{{ _('Failing Resources') }}</h2>
+        <h2>Recent Failures:</h2>
         {% set resources = response['failed_resources'] %}
         <div>
         {% if resources|length > 0 %}

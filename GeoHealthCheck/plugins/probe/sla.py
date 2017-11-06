@@ -240,7 +240,7 @@ class SLA_Compliance_WMS(SLA_Compliance):
 
 #### GML concrete probe ####
 class SLA_Compliance_GML(SLA_Compliance):
-    NAME = 'OGC Standards Compliance Test (WMS)'
+    NAME = 'OGC Standards Compliance Test (GML)'
     DESCRIPTION = 'Check for resource compliance against OGC WMS standards test.'
     AUTHOR = 'ImageMattersLLC Team'
     # See enums.py for complete list
@@ -266,7 +266,7 @@ class SLA_Compliance_GML(SLA_Compliance):
 
 #### CWS (Catalogue Conformance) Concrete Probe ####
 class SLA_Compliance_CSW(SLA_Compliance):
-    NAME = 'OGC Standards Compliance Test (WMS)'
+    NAME = 'OGC Standards Compliance Test (CSW)'
     DESCRIPTION = 'Check for resource compliance against OGC CSW standards test.'
     AUTHOR = 'ImageMattersLLC Team'
     # See enums.py for complete list

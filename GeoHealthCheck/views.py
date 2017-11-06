@@ -122,11 +122,16 @@ def get_health_summary():
 
     # For overall reliability
     total_runs = models.get_runs_count()
+    # print 'total_runs: ' + str(total_runs)
     failed_runs = models.get_runs_status_count(False)
+    # print 'failed_runs: ' + str(failed_runs) 
     success_runs = total_runs - failed_runs
+    # print 'success_runs: ' + str(success_runs)
 
     # Resources status derived from last N runs
     total_resources = models.get_resources_count()
+    # print 'total: ' + str(total_resources)
+
     last_runs = models.get_last_runs(total_resources)
     failed = 0
     failed_resources = []
@@ -134,6 +139,7 @@ def get_health_summary():
         if not run.success:
             failed_resources.append(run.resource)
             failed += 1
+    # print 'fails: ' + str(failed)
 
     success = total_resources - failed
 
